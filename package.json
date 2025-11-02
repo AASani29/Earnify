@@ -1,0 +1,35 @@
+{
+  "name": "next-jwt-auth-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "build:lib": "cd library && npm run build",
+    "seed": "tsx scripts/seed.ts",
+    "reset-admin": "tsx scripts/reset-admin.ts",
+    "check-users": "tsx scripts/check-users.ts",
+    "clear-and-seed": "tsx scripts/clear-and-seed.ts"
+  },
+  "dependencies": {
+    "axios": "^1.13.1",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^17.2.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.19.2",
+    "next": "^14.2.33",
+    "next-jwt-auth": "file:./library",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "tsx": "^4.20.6",
+    "typescript": "^5"
+  }
+}
