@@ -20,7 +20,7 @@ const categories = [
 
 export default function TasksPage() {
   const router = useRouter()
-  const { user, controller, isLoading } = useJWTAuthContext()
+  const { user, controller, isLoggedIn } = useJWTAuthContext()
   const [tasks, setTasks] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')

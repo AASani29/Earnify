@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { findUserById } from '@/lib/users'
+import connectDB from '@/lib/db'
+import User from '@/lib/models/User'
 import {
   verifyRefreshToken,
   generateAccessToken,
@@ -30,19 +31,33 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const user = findUserById(payload.id)
+    // Connect to MongoDB and fetch user
+    await connectDB()
+    const dbUser = await User.findById(payload.id).select('-password').lean()
 
-    if (!user || !user.active) {
+    if (!dbUser) {
       return NextResponse.json(
-        { message: 'User not found or inactive' },
+        { message: 'User not found' },
         { status: 401 }
       )
+    }
+
+    // Convert MongoDB user to response format
+    const user = {
+      id: dbUser._id.toString(),
+      email: dbUser.email,
+      firstName: dbUser.firstName,
+      lastName: dbUser.lastName,
+      role: dbUser.role,
+      profileCompleted: dbUser.profileCompleted,
+      isVerified: dbUser.isVerified,
+      phoneNumber: dbUser.phoneNumber,
     }
 
     const tokenPayload = {
       id: user.id,
       email: user.email,
-      type: user.type,
+      role: user.role,
     }
 
     const newAccessToken = generateAccessToken(tokenPayload)
@@ -64,6 +79,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(response)
   } catch (error) {
+    console.error('Refresh token error:', error)
     return NextResponse.json(
       { message: 'Internal server error' },
       { status: 500 }

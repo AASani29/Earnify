@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 export default function ClientDashboardPage() {
-  const { user, logout, isLoading, controller } = useJWTAuthContext()
+  const { user, logout, isLoggedIn, controller } = useJWTAuthContext()
   const router = useRouter()
   const [tasks, setTasks] = useState<any[]>([])
   const [applications, setApplications] = useState<any[]>([])
@@ -16,7 +16,7 @@ export default function ClientDashboardPage() {
   const getAccessToken = () => controller.getAccessToken()
 
   useEffect(() => {
-    if (!isLoading && user && user.role !== 'CLIENT') {
+    if (isLoggedIn === true && user && user.role !== 'CLIENT') {
       // Redirect to appropriate dashboard if not a client
       if (user.role === 'WORKER') {
         router.push('/dashboard/worker')
@@ -24,7 +24,7 @@ export default function ClientDashboardPage() {
         router.push('/dashboard/admin')
       }
     }
-  }, [user, isLoading, router])
+  }, [user, isLoggedIn, router])
 
   useEffect(() => {
     if (user && user.role === 'CLIENT') {
@@ -136,7 +136,7 @@ export default function ClientDashboardPage() {
     router.push('/login')
   }
 
-  if (isLoading) {
+  if (isLoggedIn === null) {
     return (
       <div className="container">
         <div className="card">Loading...</div>
@@ -176,32 +176,39 @@ export default function ClientDashboardPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#667eea' }}>💼 Earnify</h2>
             <nav style={{ display: 'flex', gap: '1.5rem' }}>
-              <a
-                href="/dashboard/client"
+              <button
                 style={{
                   color: '#667eea',
                   fontWeight: '600',
                   textDecoration: 'none',
                   padding: '0.5rem 1rem',
                   borderBottom: '2px solid #667eea',
+                  background: 'none',
+                  borderTop: 'none',
+                  borderLeft: 'none',
+                  borderRight: 'none',
+                  cursor: 'default',
                 }}
               >
                 Dashboard
-              </a>
-              <a
-                href="/profile"
+              </button>
+              <button
+                onClick={() => router.push('/profile')}
                 style={{
                   color: '#6c757d',
                   fontWeight: '500',
                   textDecoration: 'none',
                   padding: '0.5rem 1rem',
                   transition: 'color 0.2s',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
                 }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#667eea')}
                 onMouseLeave={e => (e.currentTarget.style.color = '#6c757d')}
               >
                 👤 My Profile
-              </a>
+              </button>
             </nav>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -494,56 +501,145 @@ export default function ClientDashboardPage() {
               </div>
 
               {applications.length === 0 ? (
-                <p style={{ color: '#666', textAlign: 'center', padding: '2rem' }}>No applications yet</p>
+                <div style={{ textAlign: 'center', padding: '3rem', color: '#6c757d' }}>
+                  <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📭</div>
+                  <p style={{ fontSize: '1.1rem' }}>No applications yet</p>
+                  <p style={{ fontSize: '0.95rem' }}>Applications will appear here once workers apply to this task.</p>
+                </div>
               ) : (
-                <div style={{ display: 'grid', gap: '1rem' }}>
+                <div style={{ display: 'grid', gap: '1.5rem' }}>
                   {applications.map(app => (
-                    <div key={app._id} style={{ padding: '1rem', background: '#f5f5f5', borderRadius: '8px' }}>
-                      <div style={{ marginBottom: '0.5rem' }}>
-                        <strong>
-                          {app.workerId.firstName} {app.workerId.lastName}
-                        </strong>
+                    <div
+                      key={app._id}
+                      style={{
+                        padding: '1.5rem',
+                        background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+                        borderRadius: '12px',
+                        border: '2px solid #e9ecef',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'flex-start',
+                          marginBottom: '1rem',
+                          flexWrap: 'wrap',
+                          gap: '1rem',
+                        }}
+                      >
+                        <div>
+                          <h3
+                            style={{
+                              fontSize: '1.25rem',
+                              fontWeight: 'bold',
+                              marginBottom: '0.25rem',
+                              color: '#495057',
+                            }}
+                          >
+                            👤 {app.workerId.firstName} {app.workerId.lastName}
+                          </h3>
+                          <p style={{ fontSize: '0.875rem', color: '#6c757d' }}>
+                            📧 {app.workerId.email}
+                            {app.workerId.phoneNumber && ` • 📱 ${app.workerId.phoneNumber}`}
+                          </p>
+                        </div>
                         <span
                           style={{
-                            marginLeft: '0.5rem',
-                            padding: '0.25rem 0.5rem',
-                            borderRadius: '4px',
-                            fontSize: '0.75rem',
+                            padding: '0.5rem 1rem',
+                            borderRadius: '20px',
+                            fontSize: '0.875rem',
+                            fontWeight: '600',
                             background:
-                              app.status === 'PENDING' ? '#fff3e0' : app.status === 'ACCEPTED' ? '#e8f5e9' : '#ffebee',
-                            color:
-                              app.status === 'PENDING' ? '#f57c00' : app.status === 'ACCEPTED' ? '#2e7d32' : '#c62828',
+                              app.status === 'PENDING'
+                                ? 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+                                : app.status === 'ACCEPTED'
+                                ? 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'
+                                : 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)',
+                            color: 'white',
                           }}
                         >
-                          {app.status}
+                          {app.status === 'PENDING'
+                            ? '⏳ Pending'
+                            : app.status === 'ACCEPTED'
+                            ? '✅ Accepted'
+                            : '❌ Rejected'}
                         </span>
                       </div>
-                      <p style={{ fontSize: '0.875rem', color: '#666', margin: '0.5rem 0' }}>{app.coverLetter}</p>
-                      {app.proposedBudget && (
-                        <p style={{ fontSize: '0.875rem', margin: '0.25rem 0' }}>
-                          <strong>Proposed Budget:</strong> ৳{app.proposedBudget}
-                        </p>
-                      )}
-                      {app.estimatedCompletionTime && (
-                        <p style={{ fontSize: '0.875rem', margin: '0.25rem 0' }}>
-                          <strong>Estimated Time:</strong> {app.estimatedCompletionTime} hours
-                        </p>
-                      )}
+
+                      <div style={{ background: 'white', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' }}>
+                        <div
+                          style={{ fontSize: '0.875rem', fontWeight: '600', color: '#6c757d', marginBottom: '0.5rem' }}
+                        >
+                          📝 Cover Letter:
+                        </div>
+                        <p style={{ color: '#495057', lineHeight: '1.6', fontSize: '0.95rem' }}>{app.coverLetter}</p>
+                      </div>
+
+                      <div
+                        style={{
+                          display: 'flex',
+                          gap: '2rem',
+                          flexWrap: 'wrap',
+                          fontSize: '0.9rem',
+                          color: '#6c757d',
+                          marginBottom: '1rem',
+                        }}
+                      >
+                        {app.proposedBudget && (
+                          <div>
+                            <span style={{ fontWeight: '600' }}>💰 Proposed Budget:</span> ৳{app.proposedBudget}
+                          </div>
+                        )}
+                        {app.estimatedCompletionTime && (
+                          <div>
+                            <span style={{ fontWeight: '600' }}>⏱️ Estimated Time:</span> {app.estimatedCompletionTime}{' '}
+                            hours
+                          </div>
+                        )}
+                        <div>
+                          <span style={{ fontWeight: '600' }}>📅 Applied:</span>{' '}
+                          {new Date(app.appliedAt).toLocaleDateString()}
+                        </div>
+                      </div>
+
                       {app.status === 'PENDING' && (
-                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                        <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                           <button
                             onClick={() => handleAcceptApplication(app._id)}
-                            className="btn btn-primary"
-                            style={{ fontSize: '0.75rem', padding: '0.25rem 0.75rem' }}
+                            style={{
+                              flex: 1,
+                              padding: '0.75rem',
+                              background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '8px',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              transition: 'transform 0.2s',
+                            }}
+                            onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-2px)')}
+                            onMouseLeave={e => (e.currentTarget.style.transform = 'translateY(0)')}
                           >
-                            Accept
+                            ✅ Accept Application
                           </button>
                           <button
                             onClick={() => handleRejectApplication(app._id)}
-                            className="btn btn-danger"
-                            style={{ fontSize: '0.75rem', padding: '0.25rem 0.75rem' }}
+                            style={{
+                              flex: 1,
+                              padding: '0.75rem',
+                              background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '8px',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              transition: 'transform 0.2s',
+                            }}
+                            onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-2px)')}
+                            onMouseLeave={e => (e.currentTarget.style.transform = 'translateY(0)')}
                           >
-                            Reject
+                            ❌ Reject Application
                           </button>
                         </div>
                       )}

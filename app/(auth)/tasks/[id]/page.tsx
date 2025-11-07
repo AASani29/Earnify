@@ -7,7 +7,7 @@ import { useJWTAuthContext } from '@/config/Auth'
 export default function TaskDetailsPage() {
   const router = useRouter()
   const params = useParams()
-  const { user, controller, isLoading } = useJWTAuthContext()
+  const { user, controller, isLoggedIn } = useJWTAuthContext()
   const [task, setTask] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -104,10 +104,18 @@ export default function TaskDetailsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">Loading task...</p>
+      <div
+        style={{
+          minHeight: '100vh',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <div style={{ textAlign: 'center', color: 'white' }}>
+          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>⏳</div>
+          <p style={{ fontSize: '1.25rem', fontWeight: '600' }}>Loading task details...</p>
         </div>
       </div>
     )
@@ -115,14 +123,23 @@ export default function TaskDetailsPage() {
 
   if (error && !task) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white rounded-lg shadow-md p-8 max-w-md">
-          <p className="text-red-600 mb-4">{error}</p>
-          <button
-            onClick={() => router.back()}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
-          >
-            Go Back
+      <div
+        style={{
+          minHeight: '100vh',
+          background: '#f8f9fa',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '1rem',
+        }}
+      >
+        <div className="card" style={{ maxWidth: '500px', textAlign: 'center' }}>
+          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>❌</div>
+          <p className="error" style={{ marginBottom: '1.5rem' }}>
+            {error}
+          </p>
+          <button onClick={() => router.back()} className="btn btn-primary" style={{ width: '100%' }}>
+            ← Go Back
           </button>
         </div>
       </div>
@@ -136,82 +153,274 @@ export default function TaskDetailsPage() {
   const isOwner = task.clientId._id === user?.id
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        <button onClick={() => router.back()} className="mb-4 text-blue-600 hover:text-blue-700 flex items-center">
-          ← Back
-        </button>
+    <div style={{ minHeight: '100vh', background: '#f8f9fa' }}>
+      {/* Hero Section with Gradient */}
+      <div
+        style={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          padding: '3rem 1rem 4rem',
+          position: 'relative',
+        }}
+      >
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <button
+            onClick={() => router.back()}
+            style={{
+              background: 'rgba(255, 255, 255, 0.2)',
+              color: 'white',
+              border: 'none',
+              padding: '0.75rem 1.5rem',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontWeight: '600',
+              marginBottom: '2rem',
+              backdropFilter: 'blur(10px)',
+            }}
+          >
+            ← Back
+          </button>
 
-        <div className="bg-white rounded-lg shadow-md p-8">
-          {/* Header */}
-          <div className="flex justify-between items-start mb-6">
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{task.title}</h1>
-              <p className="text-gray-600">
-                Posted by {task.clientId.firstName} {task.clientId.lastName}
-              </p>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+              flexWrap: 'wrap',
+              gap: '1rem',
+            }}
+          >
+            <div style={{ flex: 1, minWidth: '300px' }}>
+              <h1
+                style={{
+                  fontSize: '2.5rem',
+                  fontWeight: 'bold',
+                  color: 'white',
+                  marginBottom: '1rem',
+                  lineHeight: '1.2',
+                }}
+              >
+                {task.title}
+              </h1>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  color: 'rgba(255, 255, 255, 0.95)',
+                  fontSize: '1.1rem',
+                }}
+              >
+                <span>👤</span>
+                <span>
+                  Posted by{' '}
+                  <strong>
+                    {task.clientId.firstName} {task.clientId.lastName}
+                  </strong>
+                </span>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  fontSize: '0.95rem',
+                  marginTop: '0.5rem',
+                }}
+              >
+                <span>📅</span>
+                <span>Posted on {new Date(task.createdAt).toLocaleDateString()}</span>
+              </div>
             </div>
-            <span
-              className={`px-4 py-2 rounded-full text-sm font-medium ${
-                task.status === 'OPEN'
-                  ? 'bg-green-100 text-green-800'
-                  : task.status === 'IN_PROGRESS'
-                  ? 'bg-blue-100 text-blue-800'
-                  : task.status === 'COMPLETED'
-                  ? 'bg-gray-100 text-gray-800'
-                  : 'bg-red-100 text-red-800'
-              }`}
-            >
-              {task.status.replace('_', ' ')}
-            </span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'flex-end' }}>
+              <span
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '25px',
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  background:
+                    task.status === 'OPEN'
+                      ? 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'
+                      : task.status === 'IN_PROGRESS'
+                      ? 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
+                      : task.status === 'COMPLETED'
+                      ? 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)'
+                      : 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)',
+                  color: 'white',
+                  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
+                }}
+              >
+                {task.status.replace('_', ' ')}
+              </span>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.8)', marginBottom: '0.25rem' }}>
+                  Budget
+                </div>
+                <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: 'white' }}>
+                  ৳{task.budget.toLocaleString()}
+                </div>
+                <div style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.8)' }}>BDT</div>
+              </div>
+            </div>
           </div>
+        </div>
+      </div>
 
-          {/* Key Info */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8 p-6 bg-gray-50 rounded-lg">
-            <div>
-              <p className="text-sm text-gray-500 mb-1">Budget</p>
-              <p className="text-2xl font-bold text-gray-900">৳{task.budget.toLocaleString()}</p>
+      {/* Main Content */}
+      <div
+        style={{ maxWidth: '1200px', margin: '-2rem auto 0', padding: '0 1rem 3rem', position: 'relative', zIndex: 1 }}
+      >
+        <div className="card" style={{ marginBottom: '2rem' }}>
+          {/* Key Info Grid */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '1.5rem',
+              marginBottom: '2rem',
+            }}
+          >
+            <div
+              style={{
+                padding: '1.5rem',
+                background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                borderRadius: '12px',
+                color: 'white',
+              }}
+            >
+              <div style={{ fontSize: '0.875rem', opacity: 0.9, marginBottom: '0.5rem' }}>📂 Category</div>
+              <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>{task.category.replace('_', ' ')}</div>
             </div>
-            <div>
-              <p className="text-sm text-gray-500 mb-1">Category</p>
-              <p className="text-lg font-semibold text-gray-900">{task.category.replace('_', ' ')}</p>
+            <div
+              style={{
+                padding: '1.5rem',
+                background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                borderRadius: '12px',
+                color: 'white',
+              }}
+            >
+              <div style={{ fontSize: '0.875rem', opacity: 0.9, marginBottom: '0.5rem' }}>⏱️ Duration</div>
+              <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>
+                {task.estimatedDuration ? `${task.estimatedDuration} hours` : 'Flexible'}
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-gray-500 mb-1">Duration</p>
-              <p className="text-lg font-semibold text-gray-900">
-                {task.estimatedDuration ? `${task.estimatedDuration} hrs` : 'Not specified'}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500 mb-1">Deadline</p>
-              <p className="text-lg font-semibold text-gray-900">
-                {task.deadline ? formatDate(task.deadline) : 'Flexible'}
-              </p>
+            <div
+              style={{
+                padding: '1.5rem',
+                background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                borderRadius: '12px',
+                color: 'white',
+              }}
+            >
+              <div style={{ fontSize: '0.875rem', opacity: 0.9, marginBottom: '0.5rem' }}>📅 Deadline</div>
+              <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>
+                {task.deadline ? new Date(task.deadline).toLocaleDateString() : 'Flexible'}
+              </div>
             </div>
           </div>
 
           {/* Description */}
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">Description</h2>
-            <p className="text-gray-700 whitespace-pre-wrap">{task.description}</p>
+          <div style={{ marginBottom: '2rem' }}>
+            <h2
+              style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                marginBottom: '1rem',
+                color: '#495057',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+              }}
+            >
+              <span>📝</span> Task Description
+            </h2>
+            <div
+              style={{
+                background: '#f8f9fa',
+                padding: '1.5rem',
+                borderRadius: '12px',
+                borderLeft: '4px solid #667eea',
+              }}
+            >
+              <p style={{ color: '#495057', lineHeight: '1.8', whiteSpace: 'pre-wrap', fontSize: '1.05rem' }}>
+                {task.description}
+              </p>
+            </div>
           </div>
 
           {/* Location */}
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">Location</h2>
-            <p className="text-gray-700">{task.location.address}</p>
-            <p className="text-gray-700">
-              {task.location.city}, {task.location.district}
-            </p>
+          <div style={{ marginBottom: '2rem' }}>
+            <h2
+              style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                marginBottom: '1rem',
+                color: '#495057',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+              }}
+            >
+              <span>📍</span> Location
+            </h2>
+            <div
+              style={{
+                background: '#f8f9fa',
+                padding: '1.5rem',
+                borderRadius: '12px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.5rem',
+              }}
+            >
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.05rem', color: '#495057' }}
+              >
+                <span style={{ fontSize: '1.25rem' }}>🏠</span>
+                <span>{task.location.address}</span>
+              </div>
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.05rem', color: '#6c757d' }}
+              >
+                <span style={{ fontSize: '1.25rem' }}>🌆</span>
+                <span>
+                  {task.location.city}, {task.location.district}
+                </span>
+              </div>
+            </div>
           </div>
 
           {/* Skills Required */}
           {task.skillsRequired && task.skillsRequired.length > 0 && (
-            <div className="mb-8">
-              <h2 className="text-xl font-semibold text-gray-900 mb-3">Skills Required</h2>
-              <div className="flex flex-wrap gap-2">
+            <div style={{ marginBottom: '2rem' }}>
+              <h2
+                style={{
+                  fontSize: '1.5rem',
+                  fontWeight: 'bold',
+                  marginBottom: '1rem',
+                  color: '#495057',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                }}
+              >
+                <span>🛠️</span> Skills Required
+              </h2>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
                 {task.skillsRequired.map((skill: string, index: number) => (
-                  <span key={index} className="px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
+                  <span
+                    key={index}
+                    style={{
+                      padding: '0.75rem 1.25rem',
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      color: 'white',
+                      borderRadius: '25px',
+                      fontSize: '0.95rem',
+                      fontWeight: '600',
+                      boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
+                    }}
+                  >
                     {skill}
                   </span>
                 ))}
@@ -220,96 +429,183 @@ export default function TaskDetailsPage() {
           )}
 
           {/* Error Message */}
-          {error && <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">{error}</div>}
+          {error && (
+            <div className="error" style={{ marginBottom: '1.5rem' }}>
+              {error}
+            </div>
+          )}
 
           {/* Actions */}
           {isWorker && task.status === 'OPEN' && !showApplicationForm && (
             <button
               onClick={() => setShowApplicationForm(true)}
-              className="w-full bg-blue-600 text-white py-3 px-6 rounded-md hover:bg-blue-700 font-medium text-lg"
+              style={{
+                width: '100%',
+                padding: '1.25rem',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '12px',
+                fontSize: '1.25rem',
+                fontWeight: '700',
+                cursor: 'pointer',
+                boxShadow: '0 4px 20px rgba(102, 126, 234, 0.4)',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform = 'translateY(-2px)'
+                e.currentTarget.style.boxShadow = '0 6px 25px rgba(102, 126, 234, 0.5)'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = '0 4px 20px rgba(102, 126, 234, 0.4)'
+              }}
             >
-              Apply for this Task
+              🚀 Apply for this Task
             </button>
           )}
 
           {isClient && isOwner && (
             <button
               onClick={() => router.push(`/dashboard/client?taskId=${task._id}`)}
-              className="w-full bg-blue-600 text-white py-3 px-6 rounded-md hover:bg-blue-700 font-medium text-lg"
+              style={{
+                width: '100%',
+                padding: '1.25rem',
+                background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '12px',
+                fontSize: '1.25rem',
+                fontWeight: '700',
+                cursor: 'pointer',
+                boxShadow: '0 4px 20px rgba(79, 172, 254, 0.4)',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform = 'translateY(-2px)'
+                e.currentTarget.style.boxShadow = '0 6px 25px rgba(79, 172, 254, 0.5)'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = '0 4px 20px rgba(79, 172, 254, 0.4)'
+              }}
             >
-              Manage Applications
+              📋 Manage Applications
             </button>
           )}
 
           {/* Application Form */}
           {showApplicationForm && (
-            <div className="mt-8 p-6 bg-gray-50 rounded-lg">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Submit Your Application</h2>
-              <form onSubmit={handleApply} className="space-y-4">
-                <div>
-                  <label htmlFor="coverLetter" className="block text-sm font-medium text-gray-700 mb-2">
+            <div
+              style={{
+                marginTop: '2rem',
+                padding: '2rem',
+                background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+                borderRadius: '16px',
+                border: '2px solid #667eea',
+              }}
+            >
+              <h2
+                style={{
+                  fontSize: '1.75rem',
+                  fontWeight: 'bold',
+                  marginBottom: '1.5rem',
+                  color: '#495057',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                }}
+              >
+                <span>✍️</span> Submit Your Application
+              </h2>
+              <form onSubmit={handleApply}>
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <label className="form-label" style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>
                     Cover Letter *
                   </label>
                   <textarea
-                    id="coverLetter"
                     name="coverLetter"
                     required
-                    rows={5}
+                    rows={6}
                     value={applicationData.coverLetter}
                     onChange={handleApplicationChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Explain why you're the best fit for this task..."
+                    className="form-textarea"
+                    placeholder="Explain why you're the best fit for this task... Highlight your relevant experience and skills."
+                    style={{ width: '100%', resize: 'vertical' }}
                   />
+                  <small style={{ color: '#6c757d', fontSize: '0.875rem' }}>
+                    Make a great first impression! Explain your qualifications and approach.
+                  </small>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
                   <div>
-                    <label htmlFor="proposedBudget" className="block text-sm font-medium text-gray-700 mb-2">
-                      Your Proposed Budget (BDT)
+                    <label
+                      className="form-label"
+                      style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}
+                    >
+                      Your Proposed Budget (৳ BDT)
                     </label>
                     <input
                       type="number"
-                      id="proposedBudget"
                       name="proposedBudget"
                       min="0"
                       step="0.01"
                       value={applicationData.proposedBudget}
                       onChange={handleApplicationChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="form-input"
                       placeholder={`Original: ৳${task.budget}`}
+                      style={{ width: '100%' }}
                     />
+                    <small style={{ color: '#6c757d', fontSize: '0.875rem' }}>
+                      Optional: Propose your budget (leave blank to accept original)
+                    </small>
                   </div>
 
                   <div>
-                    <label htmlFor="estimatedCompletionTime" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      className="form-label"
+                      style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}
+                    >
                       Estimated Time (hours)
                     </label>
                     <input
                       type="number"
-                      id="estimatedCompletionTime"
                       name="estimatedCompletionTime"
                       min="0"
                       step="0.5"
                       value={applicationData.estimatedCompletionTime}
                       onChange={handleApplicationChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="e.g., 2"
+                      className="form-input"
+                      placeholder="e.g., 2.5"
+                      style={{ width: '100%' }}
                     />
+                    <small style={{ color: '#6c757d', fontSize: '0.875rem' }}>
+                      How long will it take you to complete?
+                    </small>
                   </div>
                 </div>
 
-                <div className="flex gap-4">
+                <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
+                    className="btn-submit"
+                    style={{
+                      flex: 1,
+                      padding: '1rem',
+                      fontSize: '1.1rem',
+                      opacity: submitting ? 0.6 : 1,
+                      cursor: submitting ? 'not-allowed' : 'pointer',
+                    }}
                   >
-                    {submitting ? 'Submitting...' : 'Submit Application'}
+                    {submitting ? '⏳ Submitting...' : '🚀 Submit Application'}
                   </button>
                   <button
                     type="button"
                     onClick={() => setShowApplicationForm(false)}
-                    className="px-6 py-3 border border-gray-300 rounded-md hover:bg-gray-50 font-medium"
+                    className="btn-cancel"
+                    style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}
                   >
                     Cancel
                   </button>

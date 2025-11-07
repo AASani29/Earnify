@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 export default function ProfilePage() {
-  const { user, isLoading, controller } = useJWTAuthContext()
+  const { user, isLoggedIn, controller } = useJWTAuthContext()
   const router = useRouter()
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -113,7 +113,7 @@ export default function ProfilePage() {
     }
   }
 
-  if (isLoading || loading) {
+  if (isLoggedIn === null || loading) {
     return (
       <div className="container">
         <div className="card">
@@ -150,32 +150,58 @@ export default function ProfilePage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#667eea' }}>💼 Earnify</h2>
             <nav style={{ display: 'flex', gap: '1.5rem' }}>
-              <a
-                href={user.role === 'WORKER' ? '/dashboard/worker' : '/dashboard/client'}
+              <button
+                onClick={() => router.push(user.role === 'WORKER' ? '/dashboard/worker' : '/dashboard/client')}
                 style={{
                   color: '#6c757d',
                   fontWeight: '500',
                   textDecoration: 'none',
                   padding: '0.5rem 1rem',
                   transition: 'color 0.2s',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
                 }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#667eea')}
                 onMouseLeave={e => (e.currentTarget.style.color = '#6c757d')}
               >
                 Dashboard
-              </a>
-              <a
-                href="/profile"
+              </button>
+              {user.role === 'WORKER' && (
+                <button
+                  onClick={() => router.push('/applications')}
+                  style={{
+                    color: '#6c757d',
+                    fontWeight: '500',
+                    textDecoration: 'none',
+                    padding: '0.5rem 1rem',
+                    transition: 'color 0.2s',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#667eea')}
+                  onMouseLeave={e => (e.currentTarget.style.color = '#6c757d')}
+                >
+                  📋 My Applications
+                </button>
+              )}
+              <button
                 style={{
                   color: '#667eea',
                   fontWeight: '600',
                   textDecoration: 'none',
                   padding: '0.5rem 1rem',
                   borderBottom: '2px solid #667eea',
+                  background: 'none',
+                  borderTop: 'none',
+                  borderLeft: 'none',
+                  borderRight: 'none',
+                  cursor: 'default',
                 }}
               >
                 👤 My Profile
-              </a>
+              </button>
             </nav>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>

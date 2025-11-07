@@ -6,13 +6,13 @@ import { useState } from 'react'
 import axios from 'axios'
 
 export default function ProfileSetupPage() {
-  const { user, isLoading } = useJWTAuthContext()
+  const { user, isLoggedIn } = useJWTAuthContext()
   const router = useRouter()
   const [formData, setFormData] = useState<any>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
 
-  if (isLoading) {
+  if (isLoggedIn === null) {
     return (
       <div className="container">
         <div className="card">Loading...</div>
@@ -37,7 +37,7 @@ export default function ProfileSetupPage() {
   }
 
   const handleSkillsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const skills = e.target.value.split(',').map((s) => s.trim())
+    const skills = e.target.value.split(',').map(s => s.trim())
     setFormData((prev: any) => ({ ...prev, skills }))
   }
 
@@ -153,7 +153,11 @@ export default function ProfileSetupPage() {
               />
             </div>
 
-            {error && <div className="error" style={{ marginBottom: '1rem' }}>{error}</div>}
+            {error && (
+              <div className="error" style={{ marginBottom: '1rem' }}>
+                {error}
+              </div>
+            )}
 
             <button type="submit" className="btn btn-primary" disabled={isSubmitting} style={{ width: '100%' }}>
               {isSubmitting ? 'Saving...' : 'Complete Profile'}
@@ -262,7 +266,11 @@ export default function ProfileSetupPage() {
               />
             </div>
 
-            {error && <div className="error" style={{ marginBottom: '1rem' }}>{error}</div>}
+            {error && (
+              <div className="error" style={{ marginBottom: '1rem' }}>
+                {error}
+              </div>
+            )}
 
             <button type="submit" className="btn btn-primary" disabled={isSubmitting} style={{ width: '100%' }}>
               {isSubmitting ? 'Saving...' : 'Complete Profile'}
@@ -275,4 +283,3 @@ export default function ProfileSetupPage() {
 
   return null
 }
-

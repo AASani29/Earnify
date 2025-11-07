@@ -5,11 +5,11 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
 export default function DashboardPage() {
-  const { user, isLoading } = useJWTAuthContext()
+  const { user, isLoggedIn } = useJWTAuthContext()
   const router = useRouter()
 
   useEffect(() => {
-    if (!isLoading && user) {
+    if (isLoggedIn === true && user) {
       // Redirect to role-specific dashboard
       switch (user.role) {
         case 'WORKER':
@@ -24,10 +24,10 @@ export default function DashboardPage() {
         default:
           router.push('/login')
       }
-    } else if (!isLoading && !user) {
+    } else if (isLoggedIn === false) {
       router.push('/login')
     }
-  }, [user, isLoading, router])
+  }, [user, isLoggedIn, router])
 
   return (
     <div className="container">

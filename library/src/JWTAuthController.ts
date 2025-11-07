@@ -67,6 +67,16 @@ export class JWTAuthController {
     const conventionalUnauthorizedStatusCode = 401
     const unauthorizedStatusCode = this.config.unauthorizedStatusCode ?? conventionalUnauthorizedStatusCode
     if (error.response.status === unauthorizedStatusCode) {
+      // Prevent infinite loop: Don't try to refresh if the refresh endpoint itself failed
+      const isRefreshEndpoint = this.config.endpoints.refresh &&
+        error.config.url?.includes(this.config.endpoints.refresh.url)
+
+      if (isRefreshEndpoint) {
+        console.log('Refresh token endpoint failed, logging out...')
+        this.onLogoutRequestComplete()
+        return Promise.reject(error)
+      }
+
       try {
         if (this.config.refreshToken === undefined) {
           throw new Error('Refresh token mechanism is missing')
@@ -78,6 +88,7 @@ export class JWTAuthController {
         requestConfig.headers.Authorization = `Bearer ${accessToken}`
         return this.httpClient(requestConfig)
       } catch (error) {
+        console.log('Token refresh failed, logging out...')
         this.onLogoutRequestComplete()
       }
     }

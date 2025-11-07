@@ -18,7 +18,7 @@ const categories = [
 ]
 
 export default function WorkerDashboardPage() {
-  const { user, logout, isLoading, controller } = useJWTAuthContext()
+  const { user, logout, isLoggedIn, controller } = useJWTAuthContext()
   const router = useRouter()
   const [tasks, setTasks] = useState<any[]>([])
   const [myApplications, setMyApplications] = useState<any[]>([])
@@ -32,7 +32,7 @@ export default function WorkerDashboardPage() {
   const getAccessToken = () => controller.getAccessToken()
 
   useEffect(() => {
-    if (!isLoading && user && user.role !== 'WORKER') {
+    if (isLoggedIn === true && user && user.role !== 'WORKER') {
       // Redirect to appropriate dashboard if not a worker
       if (user.role === 'CLIENT') {
         router.push('/dashboard/client')
@@ -40,7 +40,7 @@ export default function WorkerDashboardPage() {
         router.push('/dashboard/admin')
       }
     }
-  }, [user, isLoading, router])
+  }, [user, isLoggedIn, router])
 
   useEffect(() => {
     if (user && user.role === 'WORKER') {
@@ -92,7 +92,7 @@ export default function WorkerDashboardPage() {
     router.push('/login')
   }
 
-  if (isLoading) {
+  if (isLoggedIn === null) {
     return (
       <div className="container">
         <div className="card">Loading...</div>
@@ -134,32 +134,56 @@ export default function WorkerDashboardPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#667eea' }}>💼 Earnify</h2>
             <nav style={{ display: 'flex', gap: '1.5rem' }}>
-              <a
-                href="/dashboard/worker"
+              <button
                 style={{
                   color: '#667eea',
                   fontWeight: '600',
                   textDecoration: 'none',
                   padding: '0.5rem 1rem',
                   borderBottom: '2px solid #667eea',
+                  background: 'none',
+                  borderTop: 'none',
+                  borderLeft: 'none',
+                  borderRight: 'none',
+                  cursor: 'default',
                 }}
               >
                 Dashboard
-              </a>
-              <a
-                href="/profile"
+              </button>
+              <button
+                onClick={() => router.push('/applications')}
                 style={{
                   color: '#6c757d',
                   fontWeight: '500',
                   textDecoration: 'none',
                   padding: '0.5rem 1rem',
                   transition: 'color 0.2s',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#667eea')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#6c757d')}
+              >
+                📋 My Applications
+              </button>
+              <button
+                onClick={() => router.push('/profile')}
+                style={{
+                  color: '#6c757d',
+                  fontWeight: '500',
+                  textDecoration: 'none',
+                  padding: '0.5rem 1rem',
+                  transition: 'color 0.2s',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
                 }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#667eea')}
                 onMouseLeave={e => (e.currentTarget.style.color = '#6c757d')}
               >
                 👤 My Profile
-              </a>
+              </button>
             </nav>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>

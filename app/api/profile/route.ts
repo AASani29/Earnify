@@ -14,13 +14,13 @@ export async function GET(request: NextRequest) {
     const token = authHeader.substring(7)
     const decoded = verifyAccessToken(token)
 
-    if (!decoded || !decoded.userId) {
+    if (!decoded || !decoded.id) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
     await connectDB()
 
-    const user = await User.findById(decoded.userId).select('-password')
+    const user = await User.findById(decoded.id).select('-password')
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
@@ -72,7 +72,7 @@ export async function PATCH(request: NextRequest) {
     const token = authHeader.substring(7)
     const decoded = verifyAccessToken(token)
 
-    if (!decoded || !decoded.userId) {
+    if (!decoded || !decoded.id) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
@@ -80,7 +80,7 @@ export async function PATCH(request: NextRequest) {
 
     await connectDB()
 
-    const user = await User.findById(decoded.userId)
+    const user = await User.findById(decoded.id)
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
