@@ -18,6 +18,9 @@ import {
   ArrowLeft,
   Send,
   Wrench,
+  Sparkles,
+  Star,
+  MapPinIcon,
 } from 'lucide-react'
 
 export default function TaskDetailsPage() {
@@ -34,6 +37,8 @@ export default function TaskDetailsPage() {
     estimatedCompletionTime: '',
   })
   const [submitting, setSubmitting] = useState(false)
+  const [aiRecommendations, setAiRecommendations] = useState<any[]>([])
+  const [loadingRecommendations, setLoadingRecommendations] = useState(false)
 
   // Get access token from controller
   const getAccessToken = () => controller.getAccessToken()
@@ -41,6 +46,12 @@ export default function TaskDetailsPage() {
   useEffect(() => {
     fetchTask()
   }, [params.id])
+
+  useEffect(() => {
+    if (task && user && user.role === 'CLIENT' && task.clientId._id === user.id) {
+      fetchAIRecommendations()
+    }
+  }, [task, user])
 
   const fetchTask = async () => {
     try {
@@ -58,6 +69,27 @@ export default function TaskDetailsPage() {
       setError('Failed to fetch task')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchAIRecommendations = async () => {
+    try {
+      setLoadingRecommendations(true)
+      const accessToken = getAccessToken()
+      const response = await fetch(`/api/ai/recommend-workers?taskId=${params.id}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setAiRecommendations(data.recommendations || [])
+      }
+    } catch (error) {
+      console.error('Error fetching AI recommendations:', error)
+    } finally {
+      setLoadingRecommendations(false)
     }
   }
 
@@ -570,6 +602,206 @@ export default function TaskDetailsPage() {
             >
               📋 Manage Applications
             </button>
+          )}
+
+          {/* AI Recommended Workers */}
+          {isClient && isOwner && aiRecommendations.length > 0 && (
+            <div
+              style={{
+                marginTop: '2rem',
+                padding: '2rem',
+                background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+                borderRadius: '12px',
+                border: '1px solid #bae6fd',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                <div
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
+                    borderRadius: '10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Sparkles size={20} color="white" strokeWidth={2} />
+                </div>
+                <div>
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1a1a1a', margin: 0 }}>
+                    AI Recommended Workers
+                  </h2>
+                  <p style={{ fontSize: '0.875rem', color: '#666', margin: '0.25rem 0 0 0' }}>
+                    Top matches based on skills, location, and ratings
+                  </p>
+                </div>
+              </div>
+
+              {loadingRecommendations ? (
+                <div style={{ textAlign: 'center', padding: '2rem' }}>
+                  <Loader2 size={32} color="#063c7a" strokeWidth={2} style={{ animation: 'spin 1s linear infinite' }} />
+                  <p style={{ color: '#666', marginTop: '1rem' }}>Finding the best workers for you...</p>
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gap: '1.5rem' }}>
+                  {aiRecommendations.slice(0, 5).map((rec: any) => (
+                    <div
+                      key={rec.worker.userId}
+                      style={{
+                        background: 'white',
+                        padding: '1.5rem',
+                        borderRadius: '12px',
+                        border: '1px solid #e0e0e0',
+                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+                        transition: 'all 0.2s',
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(6, 60, 122, 0.15)'
+                        e.currentTarget.style.transform = 'translateY(-2px)'
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.04)'
+                        e.currentTarget.style.transform = 'translateY(0)'
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'flex-start',
+                          marginBottom: '1rem',
+                        }}
+                      >
+                        <div style={{ flex: 1 }}>
+                          <div
+                            style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}
+                          >
+                            <User size={20} color="#063c7a" strokeWidth={2} />
+                            <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#1a1a1a', margin: 0 }}>
+                              {rec.worker.firstName} {rec.worker.lastName}
+                            </h3>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                            {rec.worker.rating.average > 0 && (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                <Star size={16} color="#f59e0b" fill="#f59e0b" strokeWidth={2} />
+                                <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#1a1a1a' }}>
+                                  {rec.worker.rating.average.toFixed(1)}
+                                </span>
+                                <span style={{ fontSize: '0.75rem', color: '#666' }}>
+                                  ({rec.worker.rating.count} reviews)
+                                </span>
+                              </div>
+                            )}
+                            {rec.worker.completedTasks > 0 && (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                <CheckCircle size={16} color="#10b981" strokeWidth={2} />
+                                <span style={{ fontSize: '0.875rem', color: '#666' }}>
+                                  {rec.worker.completedTasks} tasks completed
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div
+                          style={{
+                            background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
+                            color: 'white',
+                            padding: '0.5rem 1rem',
+                            borderRadius: '8px',
+                            fontSize: '0.875rem',
+                            fontWeight: '600',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.375rem',
+                          }}
+                        >
+                          <Sparkles size={14} strokeWidth={2} />
+                          {rec.matchScore}% Match
+                        </div>
+                      </div>
+
+                      {rec.worker.bio && (
+                        <p
+                          style={{
+                            fontSize: '0.875rem',
+                            color: '#666',
+                            marginBottom: '1rem',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                          }}
+                        >
+                          {rec.worker.bio}
+                        </p>
+                      )}
+
+                      {rec.worker.skills && rec.worker.skills.length > 0 && (
+                        <div style={{ marginBottom: '1rem' }}>
+                          <p style={{ fontSize: '0.75rem', fontWeight: '600', color: '#666', marginBottom: '0.5rem' }}>
+                            Skills:
+                          </p>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                            {rec.worker.skills.slice(0, 5).map((skill: string, idx: number) => (
+                              <span
+                                key={idx}
+                                style={{
+                                  background: '#f3f4f6',
+                                  color: '#374151',
+                                  padding: '0.25rem 0.75rem',
+                                  borderRadius: '6px',
+                                  fontSize: '0.75rem',
+                                  fontWeight: '500',
+                                }}
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+                        {rec.worker.hourlyRate && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <DollarSign size={16} color="#063c7a" strokeWidth={2} />
+                            <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#1a1a1a' }}>
+                              ৳{rec.worker.hourlyRate}/hr
+                            </span>
+                          </div>
+                        )}
+                        {rec.worker.location?.city && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <MapPinIcon size={16} color="#666" strokeWidth={2} />
+                            <span style={{ fontSize: '0.875rem', color: '#666' }}>
+                              {rec.worker.location.city}
+                              {rec.worker.location.area && `, ${rec.worker.location.area}`}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {rec.matchReasons && rec.matchReasons.length > 0 && (
+                        <div style={{ paddingTop: '1rem', borderTop: '1px solid #e0e0e0' }}>
+                          <p style={{ fontSize: '0.75rem', fontWeight: '600', color: '#666', marginBottom: '0.5rem' }}>
+                            Why this worker is a great match:
+                          </p>
+                          <ul style={{ margin: 0, paddingLeft: '1.25rem', fontSize: '0.75rem', color: '#666' }}>
+                            {rec.matchReasons.slice(0, 3).map((reason: string, idx: number) => (
+                              <li key={idx}>{reason}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
 
           {/* Application Form */}

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { verifyAccessToken } from '@/lib/jwt'
 import connectDB from '@/lib/db'
 import User from '@/lib/models/User'
+import WorkerProfile from '@/lib/models/WorkerProfile'
+import ClientProfile from '@/lib/models/ClientProfile'
 
 // GET /api/profile - Get user profile
 export async function GET(request: NextRequest) {
@@ -38,20 +40,29 @@ export async function GET(request: NextRequest) {
     }
 
     if (user.role === 'WORKER') {
-      profile.bio = user.bio
-      profile.skills = user.skills
-      profile.experience = user.experience
-      profile.hourlyRate = user.hourlyRate
-      profile.city = user.city
-      profile.area = user.area
+      const workerProfile = await WorkerProfile.findOne({ userId: user._id })
+      if (workerProfile) {
+        profile.bio = workerProfile.bio
+        profile.skills = workerProfile.skills
+        profile.experience = workerProfile.experience
+        profile.hourlyRate = workerProfile.hourlyRate
+        profile.city = workerProfile.location?.city
+        profile.area = workerProfile.location?.area
+        profile.availability = workerProfile.availability
+        profile.rating = workerProfile.rating
+        profile.completedTasks = workerProfile.completedTasks
+      }
     } else if (user.role === 'CLIENT') {
-      profile.companyName = user.companyName
-      profile.companyDescription = user.companyDescription
-      profile.industry = user.industry
-      profile.website = user.website
-      profile.city = user.city
-      profile.area = user.area
-      profile.address = user.address
+      const clientProfile = await ClientProfile.findOne({ userId: user._id })
+      if (clientProfile) {
+        profile.companyName = clientProfile.companyName
+        profile.companyDescription = clientProfile.companyDescription
+        profile.industry = clientProfile.industry
+        profile.website = clientProfile.website
+        profile.city = clientProfile.location?.city
+        profile.area = clientProfile.location?.area
+        profile.address = clientProfile.location?.address
+      }
     }
 
     return NextResponse.json({ profile }, { status: 200 })
@@ -87,25 +98,57 @@ export async function PATCH(request: NextRequest) {
 
     // Update profile based on role
     if (user.role === 'WORKER') {
-      if (body.bio !== undefined) user.bio = body.bio
-      if (body.skills !== undefined) user.skills = body.skills
-      if (body.experience !== undefined) user.experience = body.experience
-      if (body.hourlyRate !== undefined) user.hourlyRate = body.hourlyRate
-      if (body.city !== undefined) user.city = body.city
-      if (body.area !== undefined) user.area = body.area
+      // Update or create WorkerProfile
+      const workerProfileData: any = {}
+
+      if (body.bio !== undefined) workerProfileData.bio = body.bio
+      if (body.skills !== undefined) workerProfileData.skills = body.skills
+      if (body.experience !== undefined) workerProfileData.experience = body.experience
+      if (body.hourlyRate !== undefined) workerProfileData.hourlyRate = parseFloat(body.hourlyRate)
+
+      // Handle location
+      if (body.city !== undefined || body.area !== undefined) {
+        workerProfileData.location = {}
+        if (body.city !== undefined) workerProfileData.location.city = body.city
+        if (body.area !== undefined) workerProfileData.location.area = body.area
+      }
+
+      if (body.availability !== undefined) workerProfileData.availability = body.availability
+
+      // Update or create worker profile
+      await WorkerProfile.findOneAndUpdate(
+        { userId: user._id },
+        { $set: workerProfileData },
+        { upsert: true, new: true }
+      )
 
       // Mark profile as completed if skills are provided
       if (body.skills && body.skills.length > 0) {
         user.profileCompleted = true
       }
     } else if (user.role === 'CLIENT') {
-      if (body.companyName !== undefined) user.companyName = body.companyName
-      if (body.companyDescription !== undefined) user.companyDescription = body.companyDescription
-      if (body.industry !== undefined) user.industry = body.industry
-      if (body.website !== undefined) user.website = body.website
-      if (body.city !== undefined) user.city = body.city
-      if (body.area !== undefined) user.area = body.area
-      if (body.address !== undefined) user.address = body.address
+      // Update or create ClientProfile
+      const clientProfileData: any = {}
+
+      if (body.companyName !== undefined) clientProfileData.companyName = body.companyName
+      if (body.companyDescription !== undefined) clientProfileData.companyDescription = body.companyDescription
+      if (body.industry !== undefined) clientProfileData.industry = body.industry
+      if (body.website !== undefined) clientProfileData.website = body.website
+
+      // Handle location
+      if (body.city !== undefined || body.area !== undefined || body.address !== undefined) {
+        clientProfileData.location = {}
+        if (body.city !== undefined) clientProfileData.location.city = body.city
+        if (body.area !== undefined) clientProfileData.location.area = body.area
+        if (body.address !== undefined) clientProfileData.location.address = body.address
+      }
+
+      // Update or create client profile
+      await ClientProfile.findOneAndUpdate(
+        { userId: user._id },
+        { $set: clientProfileData },
+        { upsert: true, new: true }
+      )
 
       // Mark profile as completed if company name is provided
       if (body.companyName) {
@@ -128,20 +171,29 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (user.role === 'WORKER') {
-      profile.bio = user.bio
-      profile.skills = user.skills
-      profile.experience = user.experience
-      profile.hourlyRate = user.hourlyRate
-      profile.city = user.city
-      profile.area = user.area
+      const workerProfile = await WorkerProfile.findOne({ userId: user._id })
+      if (workerProfile) {
+        profile.bio = workerProfile.bio
+        profile.skills = workerProfile.skills
+        profile.experience = workerProfile.experience
+        profile.hourlyRate = workerProfile.hourlyRate
+        profile.city = workerProfile.location?.city
+        profile.area = workerProfile.location?.area
+        profile.availability = workerProfile.availability
+        profile.rating = workerProfile.rating
+        profile.completedTasks = workerProfile.completedTasks
+      }
     } else if (user.role === 'CLIENT') {
-      profile.companyName = user.companyName
-      profile.companyDescription = user.companyDescription
-      profile.industry = user.industry
-      profile.website = user.website
-      profile.city = user.city
-      profile.area = user.area
-      profile.address = user.address
+      const clientProfile = await ClientProfile.findOne({ userId: user._id })
+      if (clientProfile) {
+        profile.companyName = clientProfile.companyName
+        profile.companyDescription = clientProfile.companyDescription
+        profile.industry = clientProfile.industry
+        profile.website = clientProfile.website
+        profile.city = clientProfile.location?.city
+        profile.area = clientProfile.location?.area
+        profile.address = clientProfile.location?.address
+      }
     }
 
     return NextResponse.json({ profile, message: 'Profile updated successfully' }, { status: 200 })

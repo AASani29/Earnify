@@ -46,6 +46,9 @@ export default function WorkerDashboardPage() {
   const [tasks, setTasks] = useState<any[]>([])
   const [myApplications, setMyApplications] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [aiRecommendations, setAiRecommendations] = useState<any[]>([])
+  const [loadingRecommendations, setLoadingRecommendations] = useState(false)
+  const [showRecommendations, setShowRecommendations] = useState(true)
   const [filters, setFilters] = useState({
     category: '',
     search: '',
@@ -69,6 +72,7 @@ export default function WorkerDashboardPage() {
     if (user && user.role === 'WORKER') {
       fetchTasks()
       fetchMyApplications()
+      fetchAIRecommendations()
     }
   }, [user, filters])
 
@@ -107,6 +111,34 @@ export default function WorkerDashboardPage() {
       }
     } catch (error) {
       console.error('Error fetching applications:', error)
+    }
+  }
+
+  const fetchAIRecommendations = async () => {
+    if (!user) return
+    try {
+      setLoadingRecommendations(true)
+      const accessToken = getAccessToken()
+      const response = await fetch('/api/ai/recommend-tasks', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setAiRecommendations(data.recommendations || [])
+      } else {
+        const errorData = await response.json()
+        console.log('AI recommendations error:', errorData)
+        // Don't show recommendations section if profile not found
+        if (response.status === 404) {
+          setAiRecommendations([])
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching AI recommendations:', error)
+    } finally {
+      setLoadingRecommendations(false)
     }
   }
 
@@ -341,6 +373,180 @@ export default function WorkerDashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* AI Recommendations Section */}
+        {showRecommendations && aiRecommendations.length > 0 && (
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+              padding: '2rem',
+              borderRadius: '12px',
+              border: '1px solid #bae6fd',
+              marginBottom: '2.5rem',
+            }}
+          >
+            <div
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
+                    borderRadius: '10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Sparkles size={20} color="white" strokeWidth={2} />
+                </div>
+                <div>
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1a1a1a', margin: 0 }}>
+                    AI Recommended Tasks for You
+                  </h2>
+                  <p style={{ fontSize: '0.875rem', color: '#666', margin: '0.25rem 0 0 0' }}>
+                    Based on your skills, location, and ratings
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowRecommendations(false)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#666',
+                  cursor: 'pointer',
+                  fontSize: '1.5rem',
+                  padding: '0.5rem',
+                  lineHeight: 1,
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            {loadingRecommendations ? (
+              <div style={{ textAlign: 'center', padding: '2rem' }}>
+                <p style={{ color: '#666' }}>Loading AI recommendations...</p>
+              </div>
+            ) : (
+              <div
+                style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '1.5rem' }}
+              >
+                {aiRecommendations.slice(0, 3).map((rec: any) => (
+                  <div
+                    key={rec.task._id}
+                    style={{
+                      background: 'white',
+                      padding: '1.5rem',
+                      borderRadius: '12px',
+                      border: '1px solid #e0e0e0',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+                      transition: 'all 0.2s',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => router.push(`/tasks/${rec.task._id}`)}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(6, 60, 122, 0.15)'
+                      e.currentTarget.style.transform = 'translateY(-2px)'
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.04)'
+                      e.currentTarget.style.transform = 'translateY(0)'
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginBottom: '1rem',
+                      }}
+                    >
+                      <span
+                        style={{
+                          background: '#d1fae5',
+                          color: '#065f46',
+                          padding: '0.375rem 0.75rem',
+                          borderRadius: '6px',
+                          fontSize: '0.75rem',
+                          fontWeight: '600',
+                        }}
+                      >
+                        {rec.task.category}
+                      </span>
+                      <div
+                        style={{
+                          background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
+                          color: 'white',
+                          padding: '0.375rem 0.75rem',
+                          borderRadius: '6px',
+                          fontSize: '0.75rem',
+                          fontWeight: '600',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.25rem',
+                        }}
+                      >
+                        <Sparkles size={12} strokeWidth={2} />
+                        {rec.matchScore}% Match
+                      </div>
+                    </div>
+
+                    <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#1a1a1a', marginBottom: '0.75rem' }}>
+                      {rec.task.title}
+                    </h3>
+
+                    <p
+                      style={{
+                        fontSize: '0.875rem',
+                        color: '#666',
+                        marginBottom: '1rem',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                      }}
+                    >
+                      {rec.task.description}
+                    </p>
+
+                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <DollarSign size={16} color="#063c7a" strokeWidth={2} />
+                        <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#1a1a1a' }}>
+                          ৳{rec.task.budget}
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <Clock size={16} color="#666" strokeWidth={2} />
+                        <span style={{ fontSize: '0.875rem', color: '#666' }}>
+                          {rec.task.estimatedDuration ? `${rec.task.estimatedDuration}h` : 'Not specified'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {rec.matchReasons && rec.matchReasons.length > 0 && (
+                      <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #e0e0e0' }}>
+                        <p style={{ fontSize: '0.75rem', fontWeight: '600', color: '#666', marginBottom: '0.5rem' }}>
+                          Why this matches:
+                        </p>
+                        <ul style={{ margin: 0, paddingLeft: '1.25rem', fontSize: '0.75rem', color: '#666' }}>
+                          {rec.matchReasons.slice(0, 2).map((reason: string, idx: number) => (
+                            <li key={idx}>{reason}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Filters */}
         <div
