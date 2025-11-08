@@ -4,6 +4,7 @@ import { useJWTAuthContext } from '@/config/Auth'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import AuthNavbar from '@/components/AuthNavbar'
+import ClientInProgressTasks from '@/components/ClientInProgressTasks'
 import {
   Briefcase,
   CheckCircle,
@@ -28,6 +29,7 @@ export default function ClientDashboardPage() {
   const [loading, setLoading] = useState(true)
   const [reviews, setReviews] = useState<any[]>([])
   const [loadingReviews, setLoadingReviews] = useState(false)
+  const [inProgressTasks, setInProgressTasks] = useState<any[]>([])
 
   // Get access token from controller
   const getAccessToken = () => controller.getAccessToken()
@@ -46,6 +48,7 @@ export default function ClientDashboardPage() {
   useEffect(() => {
     if (user && user.role === 'CLIENT') {
       fetchTasks()
+      fetchInProgressTasks()
       fetchReviews()
     }
   }, [user])
@@ -90,6 +93,84 @@ export default function ClientDashboardPage() {
       console.error('Error fetching reviews:', error)
     } finally {
       setLoadingReviews(false)
+    }
+  }
+
+  const fetchInProgressTasks = async () => {
+    if (!user) return
+    try {
+      const accessToken = getAccessToken()
+      const response = await fetch(`/api/tasks?clientId=${user.id}&status=IN_PROGRESS`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      if (response.ok) {
+        const data = await response.json()
+        console.log('In-progress tasks fetched:', data.tasks)
+        console.log('Number of in-progress tasks:', data.tasks?.length || 0)
+        // Log extension requests
+        data.tasks?.forEach((task: any, index: number) => {
+          console.log(`Task ${index + 1}:`, task.title)
+          console.log(`  - Has extension request:`, !!task.timeExtensionRequest)
+          if (task.timeExtensionRequest) {
+            console.log(`  - Extension status:`, task.timeExtensionRequest.status)
+            console.log(`  - Extension message:`, task.timeExtensionRequest.requestMessage)
+          }
+        })
+        setInProgressTasks(data.tasks || [])
+      }
+    } catch (error) {
+      console.error('Error fetching in-progress tasks:', error)
+    }
+  }
+
+  const handleMarkReceived = async (taskId: string) => {
+    const accessToken = getAccessToken()
+    const response = await fetch(`/api/tasks/${taskId}/mark-received`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message || 'Failed to mark as received')
+    }
+  }
+
+  const handleMakePayment = async (taskId: string) => {
+    const accessToken = getAccessToken()
+    const response = await fetch(`/api/tasks/${taskId}/make-payment`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message || 'Failed to make payment')
+    }
+  }
+
+  const handleRespondExtension = async (taskId: string, approved: boolean, message: string) => {
+    const accessToken = getAccessToken()
+    const response = await fetch(`/api/tasks/${taskId}/respond-extension`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ approved, responseMessage: message }),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message || 'Failed to respond to extension request')
     }
   }
 
@@ -853,6 +934,15 @@ export default function ClientDashboardPage() {
             </div>
           </div>
         )}
+
+        {/* In Progress Tasks Section */}
+        <ClientInProgressTasks
+          tasks={inProgressTasks}
+          onMarkReceived={handleMarkReceived}
+          onMakePayment={handleMakePayment}
+          onRespondExtension={handleRespondExtension}
+          onRefresh={fetchInProgressTasks}
+        />
 
         {/* Reviews Section */}
         <div

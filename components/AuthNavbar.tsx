@@ -27,7 +27,7 @@ export default function AuthNavbar() {
       }}
     >
       {/* Logo - Slightly to the right */}
-      <div style={{ display: 'flex', alignItems: 'center', marginLeft: '10%' }}>
+      <div style={{ display: 'flex', alignItems: 'center'}}>
         <img
           src="/Earnify-Logo.png"
           alt="Earnify"
@@ -52,7 +52,7 @@ export default function AuthNavbar() {
           display: 'flex',
           gap: '1rem',
           alignItems: 'center',
-          marginRight: '10%',
+          
         }}
       >
         {isLoggedIn === true && user ? (

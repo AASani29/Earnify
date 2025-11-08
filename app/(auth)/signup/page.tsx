@@ -3,9 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import axios from 'axios'
-import Navbar from '@/components/Navbar'
-import { UserPlus, Mail, Lock, User, Phone, Briefcase, CheckCircle } from 'lucide-react'
+import { Mail, Lock, User, Phone, Briefcase, CheckCircle } from 'lucide-react'
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -51,17 +51,35 @@ export default function SignupPage() {
 
   if (success) {
     return (
-      <div style={{ minHeight: '100vh', background: '#ffffff' }}>
-        <Navbar showAuthButtons={false} />
+      <div style={{ minHeight: '100vh', background: '#f8f9fa' }}>
         <div
           style={{
-            minHeight: 'calc(100vh - 80px)',
+            minHeight: '100vh',
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             padding: '2rem',
+            gap: '2rem',
           }}
         >
+          {/* Logo */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Image
+              src="/Earnify-Logo.png"
+              alt="Earnify Logo"
+              width={140}
+              height={140}
+              style={{ objectFit: 'contain' }}
+            />
+          </div>
+
           <div
             style={{
               width: '100%',
@@ -99,18 +117,29 @@ export default function SignupPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#ffffff' }}>
-      <Navbar showAuthButtons={false} />
-
+    <div style={{ minHeight: '100vh', background: '#f8f9fa' }}>
       <div
         style={{
-          minHeight: 'calc(100vh - 80px)',
+          minHeight: '100vh',
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           padding: '2rem',
+          gap: '2rem',
         }}
       >
+        {/* Logo */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Image src="/Earnify-Logo.png" alt="Earnify Logo" width={140} height={140} style={{ objectFit: 'contain' }} />
+        </div>
+
         <div
           style={{
             width: '100%',
@@ -124,20 +153,6 @@ export default function SignupPage() {
         >
           {/* Header */}
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-            <div
-              style={{
-                width: '64px',
-                height: '64px',
-                background: 'linear-gradient(135deg, #063c7a 0%, #084d99 100%)',
-                borderRadius: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 1.5rem',
-              }}
-            >
-              <UserPlus size={32} color="white" strokeWidth={2} />
-            </div>
             <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#1a1a1a', marginBottom: '0.5rem' }}>
               Create Account
             </h1>

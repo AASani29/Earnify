@@ -5,6 +5,7 @@ import Review from '@/lib/models/Review'
 import Task from '@/lib/models/Task'
 import WorkerProfile from '@/lib/models/WorkerProfile'
 import User from '@/lib/models/User'
+import mongoose from 'mongoose'
 
 /**
  * GET /api/reviews - Get reviews
@@ -94,19 +95,38 @@ export async function POST(req: NextRequest) {
 
     // Validate required fields
     if (!taskId || !workerId || !rating) {
+      console.log('Validation failed - missing fields:', { taskId, workerId, rating })
       return NextResponse.json(
         { error: 'Task ID, Worker ID, and rating are required' },
         { status: 400 }
       )
     }
 
-    // Verify task exists and belongs to this client
-    const task = await Task.findById(taskId)
+    // Use raw MongoDB collection to get task data
+    const db = mongoose.connection.db
+    if (!db) {
+      throw new Error('Database connection not established')
+    }
+
+    const tasksCollection = db.collection('tasks')
+    const task = await tasksCollection.findOne({ _id: new mongoose.Types.ObjectId(taskId) })
+
     if (!task) {
+      console.log('Task not found:', taskId)
       return NextResponse.json({ error: 'Task not found' }, { status: 404 })
     }
 
+    console.log('Task found:', {
+      id: task._id,
+      title: task.title,
+      status: task.status,
+      clientId: task.clientId,
+      assignedWorkerId: task.assignedWorkerId,
+      paymentStatus: task.paymentStatus,
+    })
+
     if (task.clientId.toString() !== clientId) {
+      console.log('Client mismatch:', { taskClientId: task.clientId, requestClientId: clientId })
       return NextResponse.json(
         { error: 'You can only review tasks you created' },
         { status: 403 }
@@ -115,6 +135,7 @@ export async function POST(req: NextRequest) {
 
     // Verify task is completed
     if (task.status !== 'COMPLETED') {
+      console.log('Task not completed:', { status: task.status })
       return NextResponse.json(
         { error: 'You can only review completed tasks' },
         { status: 400 }
@@ -123,6 +144,7 @@ export async function POST(req: NextRequest) {
 
     // Verify worker was assigned to this task
     if (task.assignedWorkerId?.toString() !== workerId) {
+      console.log('Worker mismatch:', { taskWorkerId: task.assignedWorkerId, requestWorkerId: workerId })
       return NextResponse.json(
         { error: 'This worker was not assigned to this task' },
         { status: 400 }

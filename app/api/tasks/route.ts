@@ -14,18 +14,20 @@ export async function GET(request: NextRequest) {
     const city = searchParams.get('city')
     const district = searchParams.get('district')
     const clientId = searchParams.get('clientId')
+    const assignedWorkerId = searchParams.get('assignedWorkerId')
     const search = searchParams.get('search')
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
 
     // Build query
     const query: any = {}
-    
+
     if (status) query.status = status
     if (category) query.category = category
     if (city) query['location.city'] = city
     if (district) query['location.district'] = district
     if (clientId) query.clientId = clientId
+    if (assignedWorkerId) query.assignedWorkerId = assignedWorkerId
     
     if (search) {
       query.$or = [
@@ -45,6 +47,18 @@ export async function GET(request: NextRequest) {
       .skip((page - 1) * limit)
       .limit(limit)
       .lean()
+
+    // Debug logging for in-progress tasks
+    if (status === 'IN_PROGRESS') {
+      console.log('Fetching IN_PROGRESS tasks for clientId:', clientId)
+      console.log('Number of tasks found:', tasks.length)
+      tasks.forEach((task: any, index: number) => {
+        console.log(`Task ${index + 1}:`, task.title)
+        console.log('  - deliveryStatus:', task.deliveryStatus)
+        console.log('  - paymentStatus:', task.paymentStatus)
+        console.log('  - timeExtensionRequest:', task.timeExtensionRequest)
+      })
+    }
 
     return NextResponse.json({
       tasks,

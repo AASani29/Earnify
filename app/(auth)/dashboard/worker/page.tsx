@@ -4,6 +4,7 @@ import { useJWTAuthContext } from '@/config/Auth'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import AuthNavbar from '@/components/AuthNavbar'
+import WorkerInProgressTasks from '@/components/WorkerInProgressTasks'
 import {
   Briefcase,
   Search,
@@ -19,7 +20,6 @@ import {
   Package,
   Clock,
   CheckCircle,
-  XCircle,
   AlertCircle,
   Eye,
   FileText,
@@ -54,6 +54,7 @@ export default function WorkerDashboardPage() {
   const [reviews, setReviews] = useState<any[]>([])
   const [loadingReviews, setLoadingReviews] = useState(false)
   const [showRecommendations, setShowRecommendations] = useState(true)
+  const [inProgressTasks, setInProgressTasks] = useState<any[]>([])
   const [filters, setFilters] = useState({
     category: '',
     search: '',
@@ -77,6 +78,7 @@ export default function WorkerDashboardPage() {
     if (user && user.role === 'WORKER') {
       fetchTasks()
       fetchMyApplications()
+      fetchInProgressTasks()
       fetchAIRecommendations()
       fetchReviews()
     }
@@ -137,6 +139,24 @@ export default function WorkerDashboardPage() {
     }
   }
 
+  const fetchInProgressTasks = async () => {
+    if (!user) return
+    try {
+      const accessToken = getAccessToken()
+      const response = await fetch(`/api/tasks?assignedWorkerId=${user.id}&status=IN_PROGRESS`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setInProgressTasks(data.tasks || [])
+      }
+    } catch (error) {
+      console.error('Error fetching in-progress tasks:', error)
+    }
+  }
+
   const fetchAIRecommendations = async () => {
     if (!user) return
     try {
@@ -162,6 +182,56 @@ export default function WorkerDashboardPage() {
       console.error('Error fetching AI recommendations:', error)
     } finally {
       setLoadingRecommendations(false)
+    }
+  }
+
+  const handleDeliverTask = async (taskId: string, message: string) => {
+    try {
+      const accessToken = getAccessToken()
+      console.log('Delivering task:', taskId, 'with message:', message)
+      const response = await fetch(`/api/tasks/${taskId}/deliver`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ deliveryMessage: message }),
+      })
+
+      const data = await response.json()
+      console.log('Deliver response:', data)
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to deliver task')
+      }
+    } catch (error) {
+      console.error('Error in handleDeliverTask:', error)
+      throw error
+    }
+  }
+
+  const handleRequestExtension = async (taskId: string, message: string, newDeadline: string) => {
+    try {
+      const accessToken = getAccessToken()
+      console.log('Requesting extension for task:', taskId, 'message:', message, 'newDeadline:', newDeadline)
+      const response = await fetch(`/api/tasks/${taskId}/request-extension`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ requestMessage: message, newDeadline }),
+      })
+
+      const data = await response.json()
+      console.log('Extension request response:', data)
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to request extension')
+      }
+    } catch (error) {
+      console.error('Error in handleRequestExtension:', error)
+      throw error
     }
   }
 
@@ -909,6 +979,14 @@ export default function WorkerDashboardPage() {
             </div>
           )}
         </div>
+
+        {/* In Progress Tasks Section */}
+        <WorkerInProgressTasks
+          tasks={inProgressTasks}
+          onDeliver={handleDeliverTask}
+          onRequestExtension={handleRequestExtension}
+          onRefresh={fetchInProgressTasks}
+        />
 
         {/* Reviews Section */}
         <div

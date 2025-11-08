@@ -3,9 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useJWTAuthContext } from '@/config/Auth'
-import Navbar from '@/components/Navbar'
-import { LogIn, Mail, Lock, Info } from 'lucide-react'
+import { Mail, Lock } from 'lucide-react'
 
 export default function LoginPage() {
   const { loginWithCredentials } = useJWTAuthContext()
@@ -35,18 +35,29 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#ffffff' }}>
-      <Navbar showAuthButtons={false} />
-
+    <div style={{ minHeight: '100vh', background: '#f8f9fa' }}>
       <div
         style={{
-          minHeight: 'calc(100vh - 80px)',
+          minHeight: '100vh',
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           padding: '2rem',
+          gap: '2rem',
         }}
       >
+        {/* Logo */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Image src="/Earnify-Logo.png" alt="Earnify Logo" width={140} height={140} style={{ objectFit: 'contain' }} />
+        </div>
+
         <div
           style={{
             width: '100%',
@@ -60,20 +71,6 @@ export default function LoginPage() {
         >
           {/* Header */}
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-            <div
-              style={{
-                width: '64px',
-                height: '64px',
-                background: 'linear-gradient(135deg, #063c7a 0%, #084d99 100%)',
-                borderRadius: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 1.5rem',
-              }}
-            >
-              <LogIn size={32} color="white" strokeWidth={2} />
-            </div>
             <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#1a1a1a', marginBottom: '0.5rem' }}>
               Welcome Back
             </h1>
@@ -249,33 +246,6 @@ export default function LoginPage() {
             >
               Sign Up
             </Link>
-          </div>
-
-          {/* Test Credentials */}
-          <div
-            style={{
-              marginTop: '2rem',
-              padding: '1rem',
-              background: '#f8f9fa',
-              borderRadius: '10px',
-              border: '1px solid #e0e0e0',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-              <Info size={16} color="#063c7a" />
-              <strong style={{ fontSize: '0.875rem', color: '#1a1a1a' }}>Test Credentials</strong>
-            </div>
-            <div style={{ fontSize: '0.8125rem', color: '#666', lineHeight: '1.6' }}>
-              <div>
-                <strong>Admin:</strong> admin@example.com / admin123
-              </div>
-              <div>
-                <strong>Client:</strong> client@example.com / client123
-              </div>
-              <div>
-                <strong>Worker:</strong> worker@example.com / worker123
-              </div>
-            </div>
           </div>
         </div>
       </div>

@@ -35,6 +35,22 @@ export interface ITask extends Document {
   skillsRequired: string[]
   estimatedDuration?: number // in hours
   images?: string[]
+  // New workflow fields
+  deliveryStatus?: 'NOT_DELIVERED' | 'DELIVERED' | 'RECEIVED'
+  deliveryMessage?: string
+  deliveredAt?: Date
+  timeExtensionRequest?: {
+    requestedBy: mongoose.Types.ObjectId
+    requestMessage: string
+    requestedAt: Date
+    status: 'PENDING' | 'APPROVED' | 'REJECTED'
+    responseMessage?: string
+    respondedAt?: Date
+    newDeadline?: Date
+  }
+  paymentStatus?: 'NOT_PAID' | 'PAID'
+  paidAt?: Date
+  completedAt?: Date
   createdAt: Date
   updatedAt: Date
 }
@@ -123,6 +139,56 @@ const taskSchema = new Schema<ITask>(
       type: [String],
       default: [],
     },
+    deliveryStatus: {
+      type: String,
+      enum: ['NOT_DELIVERED', 'DELIVERED', 'RECEIVED'],
+      default: 'NOT_DELIVERED',
+    },
+    deliveryMessage: {
+      type: String,
+      trim: true,
+    },
+    deliveredAt: {
+      type: Date,
+    },
+    timeExtensionRequest: {
+      requestedBy: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+      },
+      requestMessage: {
+        type: String,
+        trim: true,
+      },
+      requestedAt: {
+        type: Date,
+      },
+      status: {
+        type: String,
+        enum: ['PENDING', 'APPROVED', 'REJECTED'],
+      },
+      responseMessage: {
+        type: String,
+        trim: true,
+      },
+      respondedAt: {
+        type: Date,
+      },
+      newDeadline: {
+        type: Date,
+      },
+    },
+    paymentStatus: {
+      type: String,
+      enum: ['NOT_PAID', 'PAID'],
+      default: 'NOT_PAID',
+    },
+    paidAt: {
+      type: Date,
+    },
+    completedAt: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
@@ -131,6 +197,7 @@ const taskSchema = new Schema<ITask>(
 
 // Indexes for better query performance
 taskSchema.index({ clientId: 1, status: 1 })
+taskSchema.index({ assignedWorkerId: 1, status: 1 })
 taskSchema.index({ status: 1, createdAt: -1 })
 taskSchema.index({ category: 1, status: 1 })
 taskSchema.index({ 'location.city': 1, status: 1 })
