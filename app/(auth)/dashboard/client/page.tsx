@@ -3,6 +3,20 @@
 import { useJWTAuthContext } from '@/config/Auth'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import AuthNavbar from '@/components/AuthNavbar'
+import {
+  Briefcase,
+  CheckCircle,
+  Clock,
+  FileText,
+  AlertCircle,
+  Plus,
+  Eye,
+  Trash2,
+  Users,
+  TrendingUp,
+  DollarSign,
+} from 'lucide-react'
 
 export default function ClientDashboardPage() {
   const { user, logout, isLoggedIn, controller } = useJWTAuthContext()
@@ -158,86 +172,27 @@ export default function ClientDashboardPage() {
   const totalApplications = tasks.reduce((sum, task) => sum + (task.applicationCount || 0), 0)
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f8f9fa' }}>
-      {/* Top Navigation Bar */}
-      <div style={{ background: 'white', borderBottom: '2px solid #e9ecef', marginBottom: '2rem' }}>
-        <div
-          style={{
-            maxWidth: '1400px',
-            margin: '0 auto',
-            padding: '1rem 1.5rem',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '1rem',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#667eea' }}>💼 Earnify</h2>
-            <nav style={{ display: 'flex', gap: '1.5rem' }}>
-              <button
-                style={{
-                  color: '#667eea',
-                  fontWeight: '600',
-                  textDecoration: 'none',
-                  padding: '0.5rem 1rem',
-                  borderBottom: '2px solid #667eea',
-                  background: 'none',
-                  borderTop: 'none',
-                  borderLeft: 'none',
-                  borderRight: 'none',
-                  cursor: 'default',
-                }}
-              >
-                Dashboard
-              </button>
-              <button
-                onClick={() => router.push('/profile')}
-                style={{
-                  color: '#6c757d',
-                  fontWeight: '500',
-                  textDecoration: 'none',
-                  padding: '0.5rem 1rem',
-                  transition: 'color 0.2s',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#667eea')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#6c757d')}
-              >
-                👤 My Profile
-              </button>
-            </nav>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontWeight: '600', fontSize: '0.95rem' }}>
-                {user.firstName} {user.lastName}
-              </div>
-              <div style={{ fontSize: '0.8rem', color: '#6c757d' }}>Client</div>
-            </div>
-            <button onClick={handleLogout} className="btn btn-danger">
-              Logout
-            </button>
-          </div>
-        </div>
-      </div>
+    <div style={{ minHeight: '100vh', background: '#ffffff' }}>
+      <AuthNavbar />
 
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 1rem 2rem' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem 1rem' }}>
         {/* Header */}
-        <div style={{ marginBottom: '2rem' }}>
-          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>🏢 Client Dashboard</h1>
-          <p style={{ color: '#6c757d' }}>Manage your tasks and hire the best workers</p>
+        <div style={{ marginBottom: '2.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+            <Briefcase size={32} color="#063c7a" strokeWidth={2} />
+            <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#1a1a1a', margin: 0 }}>Client Dashboard</h1>
+          </div>
+          <p style={{ color: '#666', fontSize: '1rem', marginLeft: '2.75rem' }}>
+            Manage your tasks and hire the best workers
+          </p>
         </div>
 
         {/* Profile Warning */}
         {!user.profileCompleted && (
           <div
             style={{
-              background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-              color: 'white',
+              background: '#fff4e6',
+              border: '1px solid #ffa94d',
               padding: '1.5rem',
               borderRadius: '12px',
               marginBottom: '2rem',
@@ -246,34 +201,43 @@ export default function ClientDashboardPage() {
               alignItems: 'center',
               flexWrap: 'wrap',
               gap: '1rem',
-              boxShadow: '0 4px 15px rgba(245, 87, 108, 0.3)',
             }}
           >
-            <div>
-              <div style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-                ⚠️ Complete Your Company Profile
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', flex: 1 }}>
+              <AlertCircle size={24} color="#f76707" strokeWidth={2} style={{ flexShrink: 0, marginTop: '0.125rem' }} />
+              <div>
+                <div style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem', color: '#1a1a1a' }}>
+                  Complete Your Company Profile
+                </div>
+                <p style={{ fontSize: '0.9375rem', color: '#666', margin: 0 }}>
+                  Add your company information to build trust with workers and get better applications!
+                </p>
               </div>
-              <p style={{ opacity: 0.95, fontSize: '0.95rem' }}>
-                Add your company information to build trust with workers and get better applications!
-              </p>
             </div>
             <button
               onClick={() => router.push('/profile')}
               style={{
-                background: 'white',
-                color: '#f5576c',
+                background: '#063c7a',
+                color: 'white',
                 padding: '0.75rem 1.5rem',
                 border: 'none',
                 borderRadius: '8px',
                 fontWeight: '600',
                 cursor: 'pointer',
-                fontSize: '1rem',
-                transition: 'transform 0.2s',
+                fontSize: '0.9375rem',
+                transition: 'all 0.2s',
+                whiteSpace: 'nowrap',
               }}
-              onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.05)')}
-              onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = '#084d99'
+                e.currentTarget.style.transform = 'translateY(-1px)'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = '#063c7a'
+                e.currentTarget.style.transform = 'translateY(0)'
+              }}
             >
-              Complete Profile →
+              Complete Profile
             </button>
           </div>
         )}
@@ -284,114 +248,255 @@ export default function ClientDashboardPage() {
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
             gap: '1.5rem',
-            marginBottom: '2rem',
+            marginBottom: '2.5rem',
           }}
         >
           <div
-            className="card"
-            style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}
+            style={{
+              background: 'white',
+              padding: '1.75rem',
+              borderRadius: '12px',
+              border: '1px solid #e0e0e0',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+            }}
           >
-            <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>{activeTasks}</div>
-            <div style={{ fontSize: '1rem', opacity: 0.9 }}>Active Tasks</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+              <div
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  background: 'linear-gradient(135deg, #063c7a 0%, #084d99 100%)',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Clock size={24} color="white" strokeWidth={2} />
+              </div>
+              <div>
+                <div style={{ fontSize: '2rem', fontWeight: '700', color: '#1a1a1a' }}>{activeTasks}</div>
+                <div style={{ fontSize: '0.875rem', color: '#666' }}>Active Tasks</div>
+              </div>
+            </div>
           </div>
+
           <div
-            className="card"
-            style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', color: 'white' }}
+            style={{
+              background: 'white',
+              padding: '1.75rem',
+              borderRadius: '12px',
+              border: '1px solid #e0e0e0',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+            }}
           >
-            <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>{completedTasks}</div>
-            <div style={{ fontSize: '1rem', opacity: 0.9 }}>Completed Tasks</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+              <div
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <CheckCircle size={24} color="white" strokeWidth={2} />
+              </div>
+              <div>
+                <div style={{ fontSize: '2rem', fontWeight: '700', color: '#1a1a1a' }}>{completedTasks}</div>
+                <div style={{ fontSize: '0.875rem', color: '#666' }}>Completed Tasks</div>
+              </div>
+            </div>
           </div>
+
           <div
-            className="card"
-            style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', color: 'white' }}
+            style={{
+              background: 'white',
+              padding: '1.75rem',
+              borderRadius: '12px',
+              border: '1px solid #e0e0e0',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+            }}
           >
-            <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>{totalApplications}</div>
-            <div style={{ fontSize: '1rem', opacity: 0.9 }}>Total Applications</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+              <div
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Users size={24} color="white" strokeWidth={2} />
+              </div>
+              <div>
+                <div style={{ fontSize: '2rem', fontWeight: '700', color: '#1a1a1a' }}>{totalApplications}</div>
+                <div style={{ fontSize: '0.875rem', color: '#666' }}>Total Applications</div>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Quick Actions */}
-        <div className="card" style={{ marginBottom: '2rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>⚡ Quick Actions</h2>
+        <div
+          style={{
+            background: 'white',
+            padding: '2rem',
+            borderRadius: '12px',
+            border: '1px solid #e0e0e0',
+            marginBottom: '2.5rem',
+          }}
+        >
+          <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1.5rem', color: '#1a1a1a' }}>
+            Quick Actions
+          </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
             <button
               onClick={() => router.push('/tasks/create')}
               style={{
-                padding: '1.5rem',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                padding: '1.25rem',
+                background: '#063c7a',
                 color: 'white',
                 border: 'none',
-                borderRadius: '12px',
-                cursor: 'pointer',
-                fontWeight: '600',
-                fontSize: '1rem',
-                transition: 'transform 0.2s',
-                boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-4px)')}
-              onMouseLeave={e => (e.currentTarget.style.transform = 'translateY(0)')}
-            >
-              ➕ Post New Task
-            </button>
-            <button
-              onClick={() => router.push('/profile')}
-              style={{
-                padding: '1.5rem',
-                background: 'white',
-                color: '#667eea',
-                border: '2px solid #667eea',
-                borderRadius: '12px',
+                borderRadius: '10px',
                 cursor: 'pointer',
                 fontWeight: '600',
                 fontSize: '1rem',
                 transition: 'all 0.2s',
+                boxShadow: '0 4px 14px rgba(6, 60, 122, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.background = '#667eea'
-                e.currentTarget.style.color = 'white'
+                e.currentTarget.style.transform = 'translateY(-2px)'
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(6, 60, 122, 0.4)'
+                e.currentTarget.style.background = '#084d99'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = '0 4px 14px rgba(6, 60, 122, 0.3)'
+                e.currentTarget.style.background = '#063c7a'
+              }}
+            >
+              <Plus size={20} strokeWidth={2} />
+              Post New Task
+            </button>
+            <button
+              onClick={() => router.push('/profile')}
+              style={{
+                padding: '1.25rem',
+                background: 'white',
+                color: '#063c7a',
+                border: '2px solid #063c7a',
+                borderRadius: '10px',
+                cursor: 'pointer',
+                fontWeight: '600',
+                fontSize: '1rem',
+                transition: 'all 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = '#f0f4f8'
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.background = 'white'
-                e.currentTarget.style.color = '#667eea'
               }}
             >
-              👤 View Profile
+              <Users size={20} strokeWidth={2} />
+              View Profile
             </button>
           </div>
         </div>
 
         {/* My Posted Tasks */}
-        <div className="card">
-          <h2
+        <div
+          style={{
+            background: 'white',
+            padding: '2rem',
+            borderRadius: '12px',
+            border: '1px solid #e0e0e0',
+          }}
+        >
+          <div
             style={{
-              fontSize: '1.5rem',
-              fontWeight: 'bold',
-              marginBottom: '1.5rem',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
+              marginBottom: '1.5rem',
+              flexWrap: 'wrap',
+              gap: '1rem',
             }}
           >
-            <span>📋 My Posted Tasks ({tasks.length})</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <FileText size={24} color="#063c7a" strokeWidth={2} />
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1a1a1a', margin: 0 }}>
+                My Posted Tasks ({tasks.length})
+              </h2>
+            </div>
             <button
               onClick={() => router.push('/tasks/create')}
-              className="btn btn-primary"
-              style={{ fontSize: '0.875rem' }}
+              style={{
+                padding: '0.625rem 1.25rem',
+                background: '#063c7a',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '0.875rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = '#084d99'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = '#063c7a'
+              }}
             >
-              + Post New Task
+              <Plus size={16} strokeWidth={2} />
+              Post New Task
             </button>
-          </h2>
+          </div>
 
           {loading ? (
-            <div style={{ padding: '2rem', textAlign: 'center', background: '#f5f5f5', borderRadius: '8px' }}>
-              <p style={{ color: '#666' }}>Loading tasks...</p>
+            <div
+              style={{
+                padding: '3rem',
+                textAlign: 'center',
+                background: '#f8f9fa',
+                borderRadius: '8px',
+                border: '1px dashed #e0e0e0',
+              }}
+            >
+              <Clock size={32} color="#999" strokeWidth={2} style={{ margin: '0 auto 1rem' }} />
+              <p style={{ color: '#666', margin: 0 }}>Loading tasks...</p>
             </div>
           ) : tasks.length === 0 ? (
-            <div style={{ padding: '2rem', textAlign: 'center', background: '#f5f5f5', borderRadius: '8px' }}>
-              <p style={{ color: '#666' }}>You haven't posted any tasks yet.</p>
-              <p style={{ color: '#999', fontSize: '0.875rem', marginTop: '0.5rem' }}>
-                Click "Post New Task" to get started.
-              </p>
+            <div
+              style={{
+                padding: '3rem',
+                textAlign: 'center',
+                background: '#f8f9fa',
+                borderRadius: '8px',
+                border: '1px dashed #e0e0e0',
+              }}
+            >
+              <FileText size={48} color="#ccc" strokeWidth={2} style={{ margin: '0 auto 1rem' }} />
+              <p style={{ color: '#666', fontSize: '1rem', marginBottom: '0.5rem' }}>No tasks posted yet</p>
+              <p style={{ color: '#999', fontSize: '0.875rem', margin: 0 }}>Click "Post New Task" to get started</p>
             </div>
           ) : (
             <div style={{ display: 'grid', gap: '1rem' }}>
@@ -399,62 +504,138 @@ export default function ClientDashboardPage() {
                 <div
                   key={task._id}
                   style={{
-                    padding: '1rem',
-                    background: '#f5f5f5',
-                    borderRadius: '8px',
+                    padding: '1.5rem',
+                    background: '#f8f9fa',
+                    borderRadius: '10px',
+                    border: '1px solid #e0e0e0',
                     cursor: 'pointer',
+                    transition: 'all 0.2s',
                   }}
                   onClick={() => router.push(`/tasks/${task._id}`)}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.borderColor = '#063c7a'
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08)'
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.borderColor = '#e0e0e0'
+                    e.currentTarget.style.boxShadow = 'none'
+                  }}
                 >
                   <div
                     style={{
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'start',
-                      marginBottom: '0.5rem',
+                      marginBottom: '0.75rem',
+                      gap: '1rem',
                     }}
                   >
-                    <h3 style={{ margin: 0 }}>{task.title}</h3>
+                    <h3 style={{ margin: 0, fontSize: '1.125rem', fontWeight: '600', color: '#1a1a1a' }}>
+                      {task.title}
+                    </h3>
                     <span
                       style={{
-                        padding: '0.25rem 0.5rem',
-                        borderRadius: '4px',
+                        padding: '0.375rem 0.75rem',
+                        borderRadius: '6px',
                         fontSize: '0.75rem',
-                        fontWeight: 'bold',
+                        fontWeight: '600',
                         background:
-                          task.status === 'OPEN' ? '#e8f5e9' : task.status === 'IN_PROGRESS' ? '#e3f2fd' : '#f5f5f5',
-                        color: task.status === 'OPEN' ? '#2e7d32' : task.status === 'IN_PROGRESS' ? '#1976d2' : '#666',
+                          task.status === 'OPEN' ? '#d1fae5' : task.status === 'IN_PROGRESS' ? '#dbeafe' : '#e5e7eb',
+                        color:
+                          task.status === 'OPEN' ? '#065f46' : task.status === 'IN_PROGRESS' ? '#1e40af' : '#374151',
+                        whiteSpace: 'nowrap',
                       }}
                     >
                       {task.status.replace('_', ' ')}
                     </span>
                   </div>
-                  <p style={{ color: '#666', fontSize: '0.875rem', margin: '0.5rem 0' }}>
-                    {task.description.substring(0, 100)}...
+                  <p style={{ color: '#666', fontSize: '0.9375rem', margin: '0 0 1rem 0', lineHeight: '1.5' }}>
+                    {task.description.substring(0, 120)}...
                   </p>
-                  <div style={{ display: 'flex', gap: '1rem', fontSize: '0.875rem', color: '#666' }}>
-                    <span>
-                      <strong>Budget:</strong> ৳{task.budget}
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: '1.5rem',
+                      fontSize: '0.875rem',
+                      color: '#666',
+                      marginBottom: '1rem',
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                      <DollarSign size={16} color="#063c7a" strokeWidth={2} />
+                      <strong>৳{task.budget}</strong>
                     </span>
-                    <span>
-                      <strong>Category:</strong> {task.category.replace('_', ' ')}
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                      <FileText size={16} color="#063c7a" strokeWidth={2} />
+                      {task.category.replace('_', ' ')}
                     </span>
-                    <span>
-                      <strong>Location:</strong> {task.location.city}
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                      📍 {task.location.city}
                     </span>
                   </div>
-                  {task.status === 'OPEN' && (
+                  <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                     <button
                       onClick={e => {
                         e.stopPropagation()
-                        fetchApplications(task._id)
+                        router.push(`/tasks/${task._id}`)
                       }}
-                      className="btn btn-primary"
-                      style={{ marginTop: '0.5rem', fontSize: '0.75rem', padding: '0.25rem 0.75rem' }}
+                      style={{
+                        padding: '0.5rem 1rem',
+                        background: '#063c7a',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        fontSize: '0.8125rem',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.375rem',
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.background = '#084d99'
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.background = '#063c7a'
+                      }}
                     >
-                      View Applications
+                      <Eye size={14} strokeWidth={2} />
+                      View Details
                     </button>
-                  )}
+                    {task.status === 'OPEN' && (
+                      <button
+                        onClick={e => {
+                          e.stopPropagation()
+                          fetchApplications(task._id)
+                        }}
+                        style={{
+                          padding: '0.5rem 1rem',
+                          background: 'white',
+                          color: '#063c7a',
+                          border: '1px solid #063c7a',
+                          borderRadius: '6px',
+                          fontSize: '0.8125rem',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.375rem',
+                        }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.background = '#f0f4f8'
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.background = 'white'
+                        }}
+                      >
+                        <Users size={14} strokeWidth={2} />
+                        View Applications ({task.applicationCount || 0})
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

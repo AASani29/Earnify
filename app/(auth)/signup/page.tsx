@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import axios from 'axios'
+import Navbar from '@/components/Navbar'
+import { UserPlus, Mail, Lock, User, Phone, Briefcase, CheckCircle } from 'lucide-react'
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -49,112 +51,470 @@ export default function SignupPage() {
 
   if (success) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="card" style={{ width: '100%', maxWidth: '400px', textAlign: 'center' }}>
-          <div className="success" style={{ marginBottom: '1rem' }}>
-            ✓ Account created successfully!
+      <div style={{ minHeight: '100vh', background: '#ffffff' }}>
+        <Navbar showAuthButtons={false} />
+        <div
+          style={{
+            minHeight: 'calc(100vh - 80px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '2rem',
+          }}
+        >
+          <div
+            style={{
+              width: '100%',
+              maxWidth: '450px',
+              background: 'white',
+              borderRadius: '16px',
+              border: '1px solid #e0e0e0',
+              padding: '3rem',
+              textAlign: 'center',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
+            }}
+          >
+            <div
+              style={{
+                width: '80px',
+                height: '80px',
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1.5rem',
+              }}
+            >
+              <CheckCircle size={48} color="white" strokeWidth={2} />
+            </div>
+            <h2 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#1a1a1a', marginBottom: '0.75rem' }}>
+              Account Created!
+            </h2>
+            <p style={{ color: '#666', fontSize: '1rem' }}>Redirecting to login page...</p>
           </div>
-          <p>Redirecting to login...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div className="card" style={{ width: '100%', maxWidth: '400px' }}>
-        <h1 style={{ marginBottom: '1.5rem' }}>Sign Up</h1>
+    <div style={{ minHeight: '100vh', background: '#ffffff' }}>
+      <Navbar showAuthButtons={false} />
 
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem' }}>I want to</label>
-            <select
-              name="role"
-              className="input"
-              value={formData.role}
-              onChange={handleChange}
-              required
-              style={{ width: '100%', padding: '0.5rem', fontSize: '1rem' }}
+      <div
+        style={{
+          minHeight: 'calc(100vh - 80px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '2rem',
+        }}
+      >
+        <div
+          style={{
+            width: '100%',
+            maxWidth: '550px',
+            background: 'white',
+            borderRadius: '16px',
+            border: '1px solid #e0e0e0',
+            padding: '3rem',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
+          }}
+        >
+          {/* Header */}
+          <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+            <div
+              style={{
+                width: '64px',
+                height: '64px',
+                background: 'linear-gradient(135deg, #063c7a 0%, #084d99 100%)',
+                borderRadius: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1.5rem',
+              }}
             >
-              <option value="WORKER">Find Work (Service Provider)</option>
-              <option value="CLIENT">Hire Workers (Client)</option>
-            </select>
+              <UserPlus size={32} color="white" strokeWidth={2} />
+            </div>
+            <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#1a1a1a', marginBottom: '0.5rem' }}>
+              Create Account
+            </h1>
+            <p style={{ color: '#666', fontSize: '1rem' }}>Join Earnify and start your journey</p>
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem' }}>First Name</label>
-            <input
-              type="text"
-              name="firstName"
-              className="input"
-              value={formData.firstName}
-              onChange={handleChange}
-              required
-            />
+          {/* Form */}
+          <form onSubmit={handleSubmit}>
+            {/* Role Selection */}
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: '0.5rem',
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  color: '#1a1a1a',
+                }}
+              >
+                I want to
+              </label>
+              <div style={{ position: 'relative' }}>
+                <Briefcase
+                  size={20}
+                  color="#666"
+                  style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }}
+                />
+                <select
+                  name="role"
+                  value={formData.role}
+                  onChange={handleChange}
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '0.875rem 1rem 0.875rem 3rem',
+                    fontSize: '1rem',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '10px',
+                    outline: 'none',
+                    transition: 'all 0.2s',
+                    boxSizing: 'border-box',
+                    background: 'white',
+                    cursor: 'pointer',
+                  }}
+                  onFocus={e => {
+                    e.currentTarget.style.borderColor = '#063c7a'
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(6, 60, 122, 0.1)'
+                  }}
+                  onBlur={e => {
+                    e.currentTarget.style.borderColor = '#e0e0e0'
+                    e.currentTarget.style.boxShadow = 'none'
+                  }}
+                >
+                  <option value="WORKER">Find Work (Service Provider)</option>
+                  <option value="CLIENT">Hire Workers (Client)</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Name Fields - Side by Side */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+              <div>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                    fontSize: '0.875rem',
+                    fontWeight: '600',
+                    color: '#1a1a1a',
+                  }}
+                >
+                  First Name
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <User
+                    size={20}
+                    color="#666"
+                    style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }}
+                  />
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    required
+                    placeholder="John"
+                    style={{
+                      width: '100%',
+                      padding: '0.875rem 1rem 0.875rem 3rem',
+                      fontSize: '1rem',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '10px',
+                      outline: 'none',
+                      transition: 'all 0.2s',
+                      boxSizing: 'border-box',
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.borderColor = '#063c7a'
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(6, 60, 122, 0.1)'
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.borderColor = '#e0e0e0'
+                      e.currentTarget.style.boxShadow = 'none'
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                    fontSize: '0.875rem',
+                    fontWeight: '600',
+                    color: '#1a1a1a',
+                  }}
+                >
+                  Last Name
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <User
+                    size={20}
+                    color="#666"
+                    style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }}
+                  />
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    required
+                    placeholder="Doe"
+                    style={{
+                      width: '100%',
+                      padding: '0.875rem 1rem 0.875rem 3rem',
+                      fontSize: '1rem',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '10px',
+                      outline: 'none',
+                      transition: 'all 0.2s',
+                      boxSizing: 'border-box',
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.borderColor = '#063c7a'
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(6, 60, 122, 0.1)'
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.borderColor = '#e0e0e0'
+                      e.currentTarget.style.boxShadow = 'none'
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Email Field */}
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: '0.5rem',
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  color: '#1a1a1a',
+                }}
+              >
+                Email Address
+              </label>
+              <div style={{ position: 'relative' }}>
+                <Mail
+                  size={20}
+                  color="#666"
+                  style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }}
+                />
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  placeholder="you@example.com"
+                  style={{
+                    width: '100%',
+                    padding: '0.875rem 1rem 0.875rem 3rem',
+                    fontSize: '1rem',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '10px',
+                    outline: 'none',
+                    transition: 'all 0.2s',
+                    boxSizing: 'border-box',
+                  }}
+                  onFocus={e => {
+                    e.currentTarget.style.borderColor = '#063c7a'
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(6, 60, 122, 0.1)'
+                  }}
+                  onBlur={e => {
+                    e.currentTarget.style.borderColor = '#e0e0e0'
+                    e.currentTarget.style.boxShadow = 'none'
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Phone Field */}
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: '0.5rem',
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  color: '#1a1a1a',
+                }}
+              >
+                Phone Number <span style={{ color: '#999', fontWeight: '400' }}>(Optional)</span>
+              </label>
+              <div style={{ position: 'relative' }}>
+                <Phone
+                  size={20}
+                  color="#666"
+                  style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }}
+                />
+                <input
+                  type="tel"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  placeholder="+880XXXXXXXXXX"
+                  style={{
+                    width: '100%',
+                    padding: '0.875rem 1rem 0.875rem 3rem',
+                    fontSize: '1rem',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '10px',
+                    outline: 'none',
+                    transition: 'all 0.2s',
+                    boxSizing: 'border-box',
+                  }}
+                  onFocus={e => {
+                    e.currentTarget.style.borderColor = '#063c7a'
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(6, 60, 122, 0.1)'
+                  }}
+                  onBlur={e => {
+                    e.currentTarget.style.borderColor = '#e0e0e0'
+                    e.currentTarget.style.boxShadow = 'none'
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Password Field */}
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: '0.5rem',
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  color: '#1a1a1a',
+                }}
+              >
+                Password
+              </label>
+              <div style={{ position: 'relative' }}>
+                <Lock
+                  size={20}
+                  color="#666"
+                  style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }}
+                />
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  minLength={6}
+                  placeholder="Minimum 6 characters"
+                  style={{
+                    width: '100%',
+                    padding: '0.875rem 1rem 0.875rem 3rem',
+                    fontSize: '1rem',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '10px',
+                    outline: 'none',
+                    transition: 'all 0.2s',
+                    boxSizing: 'border-box',
+                  }}
+                  onFocus={e => {
+                    e.currentTarget.style.borderColor = '#063c7a'
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(6, 60, 122, 0.1)'
+                  }}
+                  onBlur={e => {
+                    e.currentTarget.style.borderColor = '#e0e0e0'
+                    e.currentTarget.style.boxShadow = 'none'
+                  }}
+                />
+              </div>
+              <small style={{ color: '#666', fontSize: '0.8125rem', marginTop: '0.25rem', display: 'block' }}>
+                Minimum 6 characters
+              </small>
+            </div>
+
+            {/* Error Message */}
+            {error && (
+              <div
+                style={{
+                  padding: '0.875rem',
+                  background: '#fee',
+                  border: '1px solid #fcc',
+                  borderRadius: '8px',
+                  color: '#c33',
+                  fontSize: '0.875rem',
+                  marginBottom: '1.5rem',
+                }}
+              >
+                {error}
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              style={{
+                width: '100%',
+                padding: '1rem',
+                background: isLoading ? '#999' : '#063c7a',
+                border: 'none',
+                borderRadius: '10px',
+                fontSize: '1rem',
+                fontWeight: '600',
+                color: 'white',
+                cursor: isLoading ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s',
+                boxShadow: '0 4px 14px rgba(6, 60, 122, 0.3)',
+              }}
+              onMouseEnter={e => {
+                if (!isLoading) {
+                  e.currentTarget.style.background = '#084d99'
+                  e.currentTarget.style.transform = 'translateY(-1px)'
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(6, 60, 122, 0.4)'
+                }
+              }}
+              onMouseLeave={e => {
+                if (!isLoading) {
+                  e.currentTarget.style.background = '#063c7a'
+                  e.currentTarget.style.transform = 'translateY(0)'
+                  e.currentTarget.style.boxShadow = '0 4px 14px rgba(6, 60, 122, 0.3)'
+                }
+              }}
+            >
+              {isLoading ? 'Creating account...' : 'Create Account'}
+            </button>
+          </form>
+
+          {/* Sign In Link */}
+          <div style={{ marginTop: '2rem', textAlign: 'center', fontSize: '0.875rem', color: '#666' }}>
+            Already have an account?{' '}
+            <Link
+              href="/login"
+              style={{
+                color: '#063c7a',
+                textDecoration: 'none',
+                fontWeight: '600',
+                transition: 'color 0.2s',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.color = '#084d99'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.color = '#063c7a'
+              }}
+            >
+              Sign In
+            </Link>
           </div>
-
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem' }}>Last Name</label>
-            <input
-              type="text"
-              name="lastName"
-              className="input"
-              value={formData.lastName}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem' }}>Email</label>
-            <input
-              type="email"
-              name="email"
-              className="input"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem' }}>Phone Number (Optional)</label>
-            <input
-              type="tel"
-              name="phoneNumber"
-              className="input"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              placeholder="+880XXXXXXXXXX"
-            />
-          </div>
-
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem' }}>Password</label>
-            <input
-              type="password"
-              name="password"
-              className="input"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              minLength={6}
-            />
-            <small style={{ color: '#666', fontSize: '0.875rem' }}>Minimum 6 characters</small>
-          </div>
-
-          {error && <div className="error">{error}</div>}
-
-          <button type="submit" className="btn btn-primary" disabled={isLoading} style={{ width: '100%' }}>
-            {isLoading ? 'Creating account...' : 'Sign Up'}
-          </button>
-        </form>
-
-        <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-          Already have an account?{' '}
-          <Link href="/login" style={{ color: '#0070f3', textDecoration: 'none' }}>
-            Sign In
-          </Link>
         </div>
       </div>
     </div>

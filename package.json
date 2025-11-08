@@ -17,6 +17,7 @@
     "bcryptjs": "^2.4.3",
     "dotenv": "^17.2.3",
     "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.553.0",
     "mongoose": "^8.19.2",
     "next": "^14.2.33",
     "next-jwt-auth": "file:./library",

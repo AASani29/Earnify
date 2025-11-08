@@ -1,8 +1,20 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useJWTAuthContext } from '@/config/Auth'
+import AuthNavbar from '@/components/AuthNavbar'
+import {
+  FileText,
+  DollarSign,
+  MapPin,
+  Calendar,
+  Clock,
+  Briefcase,
+  AlertCircle,
+  CheckCircle,
+  Wrench,
+} from 'lucide-react'
 
 const categories = [
   { value: 'DELIVERY', label: 'Delivery' },
@@ -59,10 +71,11 @@ export default function CreateTaskPage() {
   })
 
   // Redirect if not a client
-  if (user && user.role !== 'CLIENT') {
-    router.push('/dashboard')
-    return null
-  }
+  useEffect(() => {
+    if (user && user.role !== 'CLIENT') {
+      router.push('/dashboard')
+    }
+  }, [user, router])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
@@ -118,20 +131,70 @@ export default function CreateTaskPage() {
   }
 
   return (
-    <div className="form-container">
-      <div className="form-card">
-        <div className="form-header">
-          <h1 className="form-title">📋 Post a New Task</h1>
-          <p className="form-subtitle">Fill in the details below to post your task and find the perfect worker</p>
+    <div style={{ minHeight: '100vh', background: '#ffffff' }}>
+      <AuthNavbar />
+
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '2rem 1rem' }}>
+        {/* Header */}
+        <div style={{ marginBottom: '2.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+            <div
+              style={{
+                width: '64px',
+                height: '64px',
+                background: 'linear-gradient(135deg, #063c7a 0%, #084d99 100%)',
+                borderRadius: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <FileText size={32} color="white" strokeWidth={2} />
+            </div>
+            <div>
+              <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#1a1a1a', margin: 0 }}>Post a New Task</h1>
+              <p style={{ color: '#666', fontSize: '1rem', margin: 0 }}>
+                Fill in the details below to post your task and find the perfect worker
+              </p>
+            </div>
+          </div>
         </div>
 
-        {error && <div className="alert-error">{error}</div>}
+        {error && (
+          <div
+            style={{
+              background: '#fee2e2',
+              border: '1px solid #fca5a5',
+              padding: '1rem',
+              borderRadius: '8px',
+              marginBottom: '1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+            }}
+          >
+            <AlertCircle size={20} color="#dc2626" strokeWidth={2} />
+            <span style={{ color: '#dc2626', fontSize: '0.9375rem' }}>{error}</span>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           {/* Title */}
-          <div className="form-group">
-            <label htmlFor="title" className="form-label form-label-required">
-              Task Title
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label
+              htmlFor="title"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                fontWeight: '600',
+                marginBottom: '0.5rem',
+                fontSize: '0.875rem',
+                color: '#1a1a1a',
+              }}
+            >
+              <FileText size={16} color="#063c7a" strokeWidth={2} />
+              Task Title <span style={{ color: '#dc2626' }}>*</span>
             </label>
             <input
               type="text"
@@ -140,15 +203,44 @@ export default function CreateTaskPage() {
               required
               value={formData.title}
               onChange={handleChange}
-              className="form-input"
               placeholder="e.g., Need someone to deliver packages"
+              style={{
+                width: '100%',
+                padding: '0.75rem 1rem',
+                fontSize: '0.9375rem',
+                border: '1px solid #e0e0e0',
+                borderRadius: '8px',
+                outline: 'none',
+                transition: 'all 0.2s',
+                boxSizing: 'border-box',
+              }}
+              onFocus={e => {
+                e.currentTarget.style.borderColor = '#063c7a'
+                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(6, 60, 122, 0.1)'
+              }}
+              onBlur={e => {
+                e.currentTarget.style.borderColor = '#e0e0e0'
+                e.currentTarget.style.boxShadow = 'none'
+              }}
             />
           </div>
 
           {/* Description */}
-          <div className="form-group">
-            <label htmlFor="description" className="form-label form-label-required">
-              Description
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label
+              htmlFor="description"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                fontWeight: '600',
+                marginBottom: '0.5rem',
+                fontSize: '0.875rem',
+                color: '#1a1a1a',
+              }}
+            >
+              <FileText size={16} color="#063c7a" strokeWidth={2} />
+              Description <span style={{ color: '#dc2626' }}>*</span>
             </label>
             <textarea
               id="description"
@@ -156,16 +248,48 @@ export default function CreateTaskPage() {
               required
               value={formData.description}
               onChange={handleChange}
-              className="form-textarea"
               placeholder="Describe the task in detail..."
+              rows={5}
+              style={{
+                width: '100%',
+                padding: '0.75rem 1rem',
+                fontSize: '0.9375rem',
+                border: '1px solid #e0e0e0',
+                borderRadius: '8px',
+                outline: 'none',
+                transition: 'all 0.2s',
+                boxSizing: 'border-box',
+                fontFamily: 'inherit',
+                resize: 'vertical',
+              }}
+              onFocus={e => {
+                e.currentTarget.style.borderColor = '#063c7a'
+                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(6, 60, 122, 0.1)'
+              }}
+              onBlur={e => {
+                e.currentTarget.style.borderColor = '#e0e0e0'
+                e.currentTarget.style.boxShadow = 'none'
+              }}
             />
           </div>
 
           {/* Category and Budget */}
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="category" className="form-label form-label-required">
-                Category
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+            <div>
+              <label
+                htmlFor="category"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  fontWeight: '600',
+                  marginBottom: '0.5rem',
+                  fontSize: '0.875rem',
+                  color: '#1a1a1a',
+                }}
+              >
+                <Briefcase size={16} color="#063c7a" strokeWidth={2} />
+                Category <span style={{ color: '#dc2626' }}>*</span>
               </label>
               <select
                 id="category"
@@ -173,7 +297,25 @@ export default function CreateTaskPage() {
                 required
                 value={formData.category}
                 onChange={handleChange}
-                className="form-select"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  fontSize: '0.9375rem',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '8px',
+                  outline: 'none',
+                  transition: 'all 0.2s',
+                  boxSizing: 'border-box',
+                  background: 'white',
+                }}
+                onFocus={e => {
+                  e.currentTarget.style.borderColor = '#063c7a'
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(6, 60, 122, 0.1)'
+                }}
+                onBlur={e => {
+                  e.currentTarget.style.borderColor = '#e0e0e0'
+                  e.currentTarget.style.boxShadow = 'none'
+                }}
               >
                 <option value="">Select a category</option>
                 {categories.map(cat => (
@@ -184,9 +326,21 @@ export default function CreateTaskPage() {
               </select>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="budget" className="form-label form-label-required">
-                Budget (৳ BDT)
+            <div>
+              <label
+                htmlFor="budget"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  fontWeight: '600',
+                  marginBottom: '0.5rem',
+                  fontSize: '0.875rem',
+                  color: '#1a1a1a',
+                }}
+              >
+                <DollarSign size={16} color="#063c7a" strokeWidth={2} />
+                Budget (৳ BDT) <span style={{ color: '#dc2626' }}>*</span>
               </label>
               <input
                 type="number"
@@ -197,16 +351,45 @@ export default function CreateTaskPage() {
                 step="0.01"
                 value={formData.budget}
                 onChange={handleChange}
-                className="form-input"
                 placeholder="e.g., 500"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  fontSize: '0.9375rem',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '8px',
+                  outline: 'none',
+                  transition: 'all 0.2s',
+                  boxSizing: 'border-box',
+                }}
+                onFocus={e => {
+                  e.currentTarget.style.borderColor = '#063c7a'
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(6, 60, 122, 0.1)'
+                }}
+                onBlur={e => {
+                  e.currentTarget.style.borderColor = '#e0e0e0'
+                  e.currentTarget.style.boxShadow = 'none'
+                }}
               />
             </div>
           </div>
 
           {/* Location */}
-          <div className="form-group">
-            <label htmlFor="address" className="form-label form-label-required">
-              📍 Address
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label
+              htmlFor="address"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                fontWeight: '600',
+                marginBottom: '0.5rem',
+                fontSize: '0.875rem',
+                color: '#1a1a1a',
+              }}
+            >
+              <MapPin size={16} color="#063c7a" strokeWidth={2} />
+              Address <span style={{ color: '#dc2626' }}>*</span>
             </label>
             <input
               type="text"
@@ -215,15 +398,44 @@ export default function CreateTaskPage() {
               required
               value={formData.address}
               onChange={handleChange}
-              className="form-input"
               placeholder="Street address"
+              style={{
+                width: '100%',
+                padding: '0.75rem 1rem',
+                fontSize: '0.9375rem',
+                border: '1px solid #e0e0e0',
+                borderRadius: '8px',
+                outline: 'none',
+                transition: 'all 0.2s',
+                boxSizing: 'border-box',
+              }}
+              onFocus={e => {
+                e.currentTarget.style.borderColor = '#063c7a'
+                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(6, 60, 122, 0.1)'
+              }}
+              onBlur={e => {
+                e.currentTarget.style.borderColor = '#e0e0e0'
+                e.currentTarget.style.boxShadow = 'none'
+              }}
             />
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="city" className="form-label form-label-required">
-                City
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+            <div>
+              <label
+                htmlFor="city"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  fontWeight: '600',
+                  marginBottom: '0.5rem',
+                  fontSize: '0.875rem',
+                  color: '#1a1a1a',
+                }}
+              >
+                <MapPin size={16} color="#063c7a" strokeWidth={2} />
+                City <span style={{ color: '#dc2626' }}>*</span>
               </label>
               <input
                 type="text"
@@ -232,14 +444,43 @@ export default function CreateTaskPage() {
                 required
                 value={formData.city}
                 onChange={handleChange}
-                className="form-input"
                 placeholder="e.g., Dhaka"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  fontSize: '0.9375rem',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '8px',
+                  outline: 'none',
+                  transition: 'all 0.2s',
+                  boxSizing: 'border-box',
+                }}
+                onFocus={e => {
+                  e.currentTarget.style.borderColor = '#063c7a'
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(6, 60, 122, 0.1)'
+                }}
+                onBlur={e => {
+                  e.currentTarget.style.borderColor = '#e0e0e0'
+                  e.currentTarget.style.boxShadow = 'none'
+                }}
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="district" className="form-label form-label-required">
-                District
+            <div>
+              <label
+                htmlFor="district"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  fontWeight: '600',
+                  marginBottom: '0.5rem',
+                  fontSize: '0.875rem',
+                  color: '#1a1a1a',
+                }}
+              >
+                <MapPin size={16} color="#063c7a" strokeWidth={2} />
+                District <span style={{ color: '#dc2626' }}>*</span>
               </label>
               <select
                 id="district"
@@ -247,7 +488,25 @@ export default function CreateTaskPage() {
                 required
                 value={formData.district}
                 onChange={handleChange}
-                className="form-select"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  fontSize: '0.9375rem',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '8px',
+                  outline: 'none',
+                  transition: 'all 0.2s',
+                  boxSizing: 'border-box',
+                  background: 'white',
+                }}
+                onFocus={e => {
+                  e.currentTarget.style.borderColor = '#063c7a'
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(6, 60, 122, 0.1)'
+                }}
+                onBlur={e => {
+                  e.currentTarget.style.borderColor = '#e0e0e0'
+                  e.currentTarget.style.boxShadow = 'none'
+                }}
               >
                 <option value="">Select a district</option>
                 {bangladeshDistricts.map(district => (
@@ -260,10 +519,22 @@ export default function CreateTaskPage() {
           </div>
 
           {/* Optional Fields */}
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="deadline" className="form-label">
-                ⏰ Deadline
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+            <div>
+              <label
+                htmlFor="deadline"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  fontWeight: '600',
+                  marginBottom: '0.5rem',
+                  fontSize: '0.875rem',
+                  color: '#1a1a1a',
+                }}
+              >
+                <Calendar size={16} color="#063c7a" strokeWidth={2} />
+                Deadline
               </label>
               <input
                 type="datetime-local"
@@ -271,13 +542,42 @@ export default function CreateTaskPage() {
                 name="deadline"
                 value={formData.deadline}
                 onChange={handleChange}
-                className="form-input"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  fontSize: '0.9375rem',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '8px',
+                  outline: 'none',
+                  transition: 'all 0.2s',
+                  boxSizing: 'border-box',
+                }}
+                onFocus={e => {
+                  e.currentTarget.style.borderColor = '#063c7a'
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(6, 60, 122, 0.1)'
+                }}
+                onBlur={e => {
+                  e.currentTarget.style.borderColor = '#e0e0e0'
+                  e.currentTarget.style.boxShadow = 'none'
+                }}
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="estimatedDuration" className="form-label">
-                ⏱️ Estimated Duration (hours)
+            <div>
+              <label
+                htmlFor="estimatedDuration"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  fontWeight: '600',
+                  marginBottom: '0.5rem',
+                  fontSize: '0.875rem',
+                  color: '#1a1a1a',
+                }}
+              >
+                <Clock size={16} color="#063c7a" strokeWidth={2} />
+                Estimated Duration (hours)
               </label>
               <input
                 type="number"
@@ -287,15 +587,44 @@ export default function CreateTaskPage() {
                 step="0.5"
                 value={formData.estimatedDuration}
                 onChange={handleChange}
-                className="form-input"
                 placeholder="e.g., 2"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  fontSize: '0.9375rem',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '8px',
+                  outline: 'none',
+                  transition: 'all 0.2s',
+                  boxSizing: 'border-box',
+                }}
+                onFocus={e => {
+                  e.currentTarget.style.borderColor = '#063c7a'
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(6, 60, 122, 0.1)'
+                }}
+                onBlur={e => {
+                  e.currentTarget.style.borderColor = '#e0e0e0'
+                  e.currentTarget.style.boxShadow = 'none'
+                }}
               />
             </div>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="skillsRequired" className="form-label">
-              🛠️ Skills Required
+          <div style={{ marginBottom: '2rem' }}>
+            <label
+              htmlFor="skillsRequired"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                fontWeight: '600',
+                marginBottom: '0.5rem',
+                fontSize: '0.875rem',
+                color: '#1a1a1a',
+              }}
+            >
+              <Wrench size={16} color="#063c7a" strokeWidth={2} />
+              Skills Required
             </label>
             <input
               type="text"
@@ -303,18 +632,91 @@ export default function CreateTaskPage() {
               name="skillsRequired"
               value={formData.skillsRequired}
               onChange={handleChange}
-              className="form-input"
               placeholder="e.g., Driving, Navigation, Customer Service"
+              style={{
+                width: '100%',
+                padding: '0.75rem 1rem',
+                fontSize: '0.9375rem',
+                border: '1px solid #e0e0e0',
+                borderRadius: '8px',
+                outline: 'none',
+                transition: 'all 0.2s',
+                boxSizing: 'border-box',
+              }}
+              onFocus={e => {
+                e.currentTarget.style.borderColor = '#063c7a'
+                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(6, 60, 122, 0.1)'
+              }}
+              onBlur={e => {
+                e.currentTarget.style.borderColor = '#e0e0e0'
+                e.currentTarget.style.boxShadow = 'none'
+              }}
             />
           </div>
 
           {/* Submit Button */}
-          <div className="form-actions">
-            <button type="submit" disabled={loading} className="btn-submit">
-              {loading ? '⏳ Creating Task...' : '✨ Post Task'}
-            </button>
-            <button type="button" onClick={() => router.back()} className="btn-cancel">
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+            <button
+              type="button"
+              onClick={() => router.back()}
+              style={{
+                padding: '0.75rem 1.5rem',
+                background: 'white',
+                color: '#666',
+                border: '1px solid #e0e0e0',
+                borderRadius: '8px',
+                fontWeight: '600',
+                fontSize: '0.9375rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = '#f0f4f8'
+                e.currentTarget.style.borderColor = '#063c7a'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = 'white'
+                e.currentTarget.style.borderColor = '#e0e0e0'
+              }}
+            >
               Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                padding: '0.75rem 2rem',
+                background: loading ? '#ccc' : '#063c7a',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontWeight: '600',
+                fontSize: '0.9375rem',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+              }}
+              onMouseEnter={e => {
+                if (!loading) {
+                  e.currentTarget.style.background = '#084d99'
+                }
+              }}
+              onMouseLeave={e => {
+                if (!loading) {
+                  e.currentTarget.style.background = '#063c7a'
+                }
+              }}
+            >
+              {loading ? (
+                <>Creating Task...</>
+              ) : (
+                <>
+                  <CheckCircle size={18} strokeWidth={2} />
+                  Post Task
+                </>
+              )}
             </button>
           </div>
         </form>

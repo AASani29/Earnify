@@ -3,18 +3,41 @@
 import { useJWTAuthContext } from '@/config/Auth'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import AuthNavbar from '@/components/AuthNavbar'
+import {
+  Briefcase,
+  Search,
+  Filter,
+  Truck,
+  Sparkles,
+  Laptop,
+  Wrench,
+  BookOpen,
+  Camera,
+  PenTool,
+  Palette,
+  Package,
+  Clock,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Eye,
+  FileText,
+  DollarSign,
+  TrendingUp,
+} from 'lucide-react'
 
 const categories = [
-  { value: '', label: 'All Categories' },
-  { value: 'DELIVERY', label: '🚚 Delivery' },
-  { value: 'CLEANING', label: '🧹 Cleaning' },
-  { value: 'TECH_SUPPORT', label: '💻 Tech Support' },
-  { value: 'HANDYMAN', label: '🔧 Handyman' },
-  { value: 'TUTORING', label: '📚 Tutoring' },
-  { value: 'PHOTOGRAPHY', label: '📷 Photography' },
-  { value: 'WRITING', label: '✍️ Writing' },
-  { value: 'DESIGN', label: '🎨 Design' },
-  { value: 'OTHER', label: '📦 Other' },
+  { value: '', label: 'All Categories', icon: null },
+  { value: 'DELIVERY', label: 'Delivery', icon: Truck },
+  { value: 'CLEANING', label: 'Cleaning', icon: Sparkles },
+  { value: 'TECH_SUPPORT', label: 'Tech Support', icon: Laptop },
+  { value: 'HANDYMAN', label: 'Handyman', icon: Wrench },
+  { value: 'TUTORING', label: 'Tutoring', icon: BookOpen },
+  { value: 'PHOTOGRAPHY', label: 'Photography', icon: Camera },
+  { value: 'WRITING', label: 'Writing', icon: PenTool },
+  { value: 'DESIGN', label: 'Design', icon: Palette },
+  { value: 'OTHER', label: 'Other', icon: Package },
 ]
 
 export default function WorkerDashboardPage() {
@@ -116,103 +139,27 @@ export default function WorkerDashboardPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f8f9fa' }}>
-      {/* Top Navigation Bar */}
-      <div style={{ background: 'white', borderBottom: '2px solid #e9ecef', marginBottom: '2rem' }}>
-        <div
-          style={{
-            maxWidth: '1400px',
-            margin: '0 auto',
-            padding: '1rem 1.5rem',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '1rem',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#667eea' }}>💼 Earnify</h2>
-            <nav style={{ display: 'flex', gap: '1.5rem' }}>
-              <button
-                style={{
-                  color: '#667eea',
-                  fontWeight: '600',
-                  textDecoration: 'none',
-                  padding: '0.5rem 1rem',
-                  borderBottom: '2px solid #667eea',
-                  background: 'none',
-                  borderTop: 'none',
-                  borderLeft: 'none',
-                  borderRight: 'none',
-                  cursor: 'default',
-                }}
-              >
-                Dashboard
-              </button>
-              <button
-                onClick={() => router.push('/applications')}
-                style={{
-                  color: '#6c757d',
-                  fontWeight: '500',
-                  textDecoration: 'none',
-                  padding: '0.5rem 1rem',
-                  transition: 'color 0.2s',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#667eea')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#6c757d')}
-              >
-                📋 My Applications
-              </button>
-              <button
-                onClick={() => router.push('/profile')}
-                style={{
-                  color: '#6c757d',
-                  fontWeight: '500',
-                  textDecoration: 'none',
-                  padding: '0.5rem 1rem',
-                  transition: 'color 0.2s',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#667eea')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#6c757d')}
-              >
-                👤 My Profile
-              </button>
-            </nav>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontWeight: '600', fontSize: '0.95rem' }}>
-                {user.firstName} {user.lastName}
-              </div>
-              <div style={{ fontSize: '0.8rem', color: '#6c757d' }}>Worker</div>
-            </div>
-            <button onClick={handleLogout} className="btn btn-danger">
-              Logout
-            </button>
-          </div>
-        </div>
-      </div>
+    <div style={{ minHeight: '100vh', background: '#ffffff' }}>
+      <AuthNavbar />
 
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 1rem 2rem' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem 1rem' }}>
         {/* Header */}
-        <div style={{ marginBottom: '2rem' }}>
-          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>👷 Worker Dashboard</h1>
-          <p style={{ color: '#6c757d' }}>Welcome back, {user.firstName}! Find and apply for tasks below.</p>
+        <div style={{ marginBottom: '2.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+            <Briefcase size={32} color="#063c7a" strokeWidth={2} />
+            <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#1a1a1a', margin: 0 }}>Worker Dashboard</h1>
+          </div>
+          <p style={{ color: '#666', fontSize: '1rem', marginLeft: '2.75rem' }}>
+            Welcome back, {user.firstName}! Find and apply for tasks below
+          </p>
         </div>
 
         {/* Profile Warning */}
         {!user.profileCompleted && (
           <div
             style={{
-              background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-              color: 'white',
+              background: '#fff4e6',
+              border: '1px solid #ffa94d',
               padding: '1.5rem',
               borderRadius: '12px',
               marginBottom: '2rem',
@@ -221,34 +168,43 @@ export default function WorkerDashboardPage() {
               alignItems: 'center',
               flexWrap: 'wrap',
               gap: '1rem',
-              boxShadow: '0 4px 15px rgba(245, 87, 108, 0.3)',
             }}
           >
-            <div>
-              <div style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-                ⚠️ Complete Your Profile
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', flex: 1 }}>
+              <AlertCircle size={24} color="#f76707" strokeWidth={2} style={{ flexShrink: 0, marginTop: '0.125rem' }} />
+              <div>
+                <div style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem', color: '#1a1a1a' }}>
+                  Complete Your Profile
+                </div>
+                <p style={{ fontSize: '0.9375rem', color: '#666', margin: 0 }}>
+                  Add your skills, experience, and portfolio to increase your chances of getting hired!
+                </p>
               </div>
-              <p style={{ opacity: 0.95, fontSize: '0.95rem' }}>
-                Add your skills, experience, and portfolio to increase your chances of getting hired by 80%!
-              </p>
             </div>
             <button
               onClick={() => router.push('/profile')}
               style={{
-                background: 'white',
-                color: '#f5576c',
+                background: '#063c7a',
+                color: 'white',
                 padding: '0.75rem 1.5rem',
                 border: 'none',
                 borderRadius: '8px',
                 fontWeight: '600',
                 cursor: 'pointer',
-                fontSize: '1rem',
-                transition: 'transform 0.2s',
+                fontSize: '0.9375rem',
+                transition: 'all 0.2s',
+                whiteSpace: 'nowrap',
               }}
-              onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.05)')}
-              onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = '#084d99'
+                e.currentTarget.style.transform = 'translateY(-1px)'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = '#063c7a'
+                e.currentTarget.style.transform = 'translateY(0)'
+              }}
             >
-              Complete Profile →
+              Complete Profile
             </button>
           </div>
         )}
@@ -259,39 +215,149 @@ export default function WorkerDashboardPage() {
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
             gap: '1.5rem',
-            marginBottom: '2rem',
+            marginBottom: '2.5rem',
           }}
         >
           <div
-            className="card"
-            style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}
+            onClick={() => router.push('/applications')}
+            style={{
+              background: 'white',
+              padding: '1.75rem',
+              borderRadius: '12px',
+              border: '1px solid #e0e0e0',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = '#f59e0b'
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.2)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = '#e0e0e0'
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.04)'
+            }}
           >
-            <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-              {stats.activeApplications}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+              <div
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Clock size={24} color="white" strokeWidth={2} />
+              </div>
+              <div>
+                <div style={{ fontSize: '2rem', fontWeight: '700', color: '#1a1a1a' }}>{stats.activeApplications}</div>
+                <div style={{ fontSize: '0.875rem', color: '#666' }}>Pending Applications</div>
+              </div>
             </div>
-            <div style={{ fontSize: '1rem', opacity: 0.9 }}>Pending Applications</div>
           </div>
+
           <div
-            className="card"
-            style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', color: 'white' }}
+            onClick={() => router.push('/applications')}
+            style={{
+              background: 'white',
+              padding: '1.75rem',
+              borderRadius: '12px',
+              border: '1px solid #e0e0e0',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = '#10b981'
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.2)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = '#e0e0e0'
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.04)'
+            }}
           >
-            <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>{stats.acceptedTasks}</div>
-            <div style={{ fontSize: '1rem', opacity: 0.9 }}>Accepted Tasks</div>
-          </div>
-          <div
-            className="card"
-            style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', color: 'white' }}
-          >
-            <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-              {stats.totalApplications}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+              <div
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <CheckCircle size={24} color="white" strokeWidth={2} />
+              </div>
+              <div>
+                <div style={{ fontSize: '2rem', fontWeight: '700', color: '#1a1a1a' }}>{stats.acceptedTasks}</div>
+                <div style={{ fontSize: '0.875rem', color: '#666' }}>Accepted Tasks</div>
+              </div>
             </div>
-            <div style={{ fontSize: '1rem', opacity: 0.9 }}>Total Applications</div>
+          </div>
+
+          <div
+            onClick={() => router.push('/applications')}
+            style={{
+              background: 'white',
+              padding: '1.75rem',
+              borderRadius: '12px',
+              border: '1px solid #e0e0e0',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = '#063c7a'
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(6, 60, 122, 0.2)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = '#e0e0e0'
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.04)'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+              <div
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  background: 'linear-gradient(135deg, #063c7a 0%, #084d99 100%)',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <TrendingUp size={24} color="white" strokeWidth={2} />
+              </div>
+              <div>
+                <div style={{ fontSize: '2rem', fontWeight: '700', color: '#1a1a1a' }}>{stats.totalApplications}</div>
+                <div style={{ fontSize: '0.875rem', color: '#666' }}>Total Applications</div>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="card" style={{ marginBottom: '2rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>🔍 Find Available Tasks</h2>
+        <div
+          style={{
+            background: 'white',
+            padding: '2rem',
+            borderRadius: '12px',
+            border: '1px solid #e0e0e0',
+            marginBottom: '2.5rem',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+            <Filter size={24} color="#063c7a" strokeWidth={2} />
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1a1a1a', margin: 0 }}>
+              Find Available Tasks
+            </h2>
+          </div>
           <div
             style={{
               display: 'grid',
@@ -300,21 +366,83 @@ export default function WorkerDashboardPage() {
             }}
           >
             <div>
-              <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>Search</label>
-              <input
-                type="text"
-                className="input"
-                placeholder="Search tasks..."
-                value={filters.search}
-                onChange={e => setFilters({ ...filters, search: e.target.value })}
-              />
+              <label
+                style={{
+                  display: 'block',
+                  fontWeight: '600',
+                  marginBottom: '0.5rem',
+                  fontSize: '0.875rem',
+                  color: '#1a1a1a',
+                }}
+              >
+                Search
+              </label>
+              <div style={{ position: 'relative' }}>
+                <Search
+                  size={18}
+                  color="#999"
+                  style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }}
+                />
+                <input
+                  type="text"
+                  placeholder="Search tasks..."
+                  value={filters.search}
+                  onChange={e => setFilters({ ...filters, search: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem 0.75rem 3rem',
+                    fontSize: '0.9375rem',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '8px',
+                    outline: 'none',
+                    transition: 'all 0.2s',
+                    boxSizing: 'border-box',
+                  }}
+                  onFocus={e => {
+                    e.currentTarget.style.borderColor = '#063c7a'
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(6, 60, 122, 0.1)'
+                  }}
+                  onBlur={e => {
+                    e.currentTarget.style.borderColor = '#e0e0e0'
+                    e.currentTarget.style.boxShadow = 'none'
+                  }}
+                />
+              </div>
             </div>
             <div>
-              <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>Category</label>
+              <label
+                style={{
+                  display: 'block',
+                  fontWeight: '600',
+                  marginBottom: '0.5rem',
+                  fontSize: '0.875rem',
+                  color: '#1a1a1a',
+                }}
+              >
+                Category
+              </label>
               <select
-                className="input"
                 value={filters.category}
                 onChange={e => setFilters({ ...filters, category: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  fontSize: '0.9375rem',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '8px',
+                  outline: 'none',
+                  transition: 'all 0.2s',
+                  boxSizing: 'border-box',
+                  background: 'white',
+                }}
+                onFocus={e => {
+                  e.currentTarget.style.borderColor = '#063c7a'
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(6, 60, 122, 0.1)'
+                }}
+                onBlur={e => {
+                  e.currentTarget.style.borderColor = '#e0e0e0'
+                  e.currentTarget.style.boxShadow = 'none'
+                }}
               >
                 {categories.map(cat => (
                   <option key={cat.value} value={cat.value}>
@@ -324,11 +452,39 @@ export default function WorkerDashboardPage() {
               </select>
             </div>
             <div>
-              <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>Status</label>
+              <label
+                style={{
+                  display: 'block',
+                  fontWeight: '600',
+                  marginBottom: '0.5rem',
+                  fontSize: '0.875rem',
+                  color: '#1a1a1a',
+                }}
+              >
+                Status
+              </label>
               <select
-                className="input"
                 value={filters.status}
                 onChange={e => setFilters({ ...filters, status: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  fontSize: '0.9375rem',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '8px',
+                  outline: 'none',
+                  transition: 'all 0.2s',
+                  boxSizing: 'border-box',
+                  background: 'white',
+                }}
+                onFocus={e => {
+                  e.currentTarget.style.borderColor = '#063c7a'
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(6, 60, 122, 0.1)'
+                }}
+                onBlur={e => {
+                  e.currentTarget.style.borderColor = '#e0e0e0'
+                  e.currentTarget.style.boxShadow = 'none'
+                }}
               >
                 <option value="">All Status</option>
                 <option value="OPEN">Open</option>
@@ -340,102 +496,185 @@ export default function WorkerDashboardPage() {
         </div>
 
         {/* Available Tasks */}
-        <div className="card">
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>
-            📋 Available Tasks ({tasks.length})
-          </h2>
+        <div
+          style={{
+            background: 'white',
+            padding: '2rem',
+            borderRadius: '12px',
+            border: '1px solid #e0e0e0',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+            <FileText size={24} color="#063c7a" strokeWidth={2} />
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1a1a1a', margin: 0 }}>
+              Available Tasks ({tasks.length})
+            </h2>
+          </div>
 
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '3rem', color: '#6c757d' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⏳</div>
-              <p>Loading tasks...</p>
+            <div
+              style={{
+                textAlign: 'center',
+                padding: '3rem',
+                background: '#f8f9fa',
+                borderRadius: '8px',
+                border: '1px dashed #e0e0e0',
+              }}
+            >
+              <Clock size={48} color="#999" strokeWidth={2} style={{ margin: '0 auto 1rem' }} />
+              <p style={{ color: '#666', margin: 0 }}>Loading tasks...</p>
             </div>
           ) : tasks.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '3rem', background: '#f8f9fa', borderRadius: '8px' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📭</div>
-              <p style={{ color: '#6c757d', fontSize: '1.1rem' }}>No tasks found</p>
-              <p style={{ color: '#adb5bd', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+            <div
+              style={{
+                textAlign: 'center',
+                padding: '3rem',
+                background: '#f8f9fa',
+                borderRadius: '8px',
+                border: '1px dashed #e0e0e0',
+              }}
+            >
+              <FileText size={48} color="#ccc" strokeWidth={2} style={{ margin: '0 auto 1rem' }} />
+              <p style={{ color: '#666', fontSize: '1rem', marginBottom: '0.5rem' }}>No tasks found</p>
+              <p style={{ color: '#999', fontSize: '0.875rem', margin: 0 }}>
                 Try adjusting your filters or check back later
               </p>
             </div>
           ) : (
-            <div style={{ display: 'grid', gap: '1.5rem' }}>
+            <div style={{ display: 'grid', gap: '1rem' }}>
               {tasks.map(task => (
                 <div
                   key={task._id}
                   style={{
-                    border: '2px solid #e9ecef',
-                    borderRadius: '12px',
                     padding: '1.5rem',
-                    transition: 'all 0.2s',
+                    background: '#f8f9fa',
+                    borderRadius: '10px',
+                    border: '1px solid #e0e0e0',
                     cursor: 'pointer',
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.borderColor = '#667eea'
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.15)'
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.borderColor = '#e9ecef'
-                    e.currentTarget.style.boxShadow = 'none'
+                    transition: 'all 0.2s',
                   }}
                   onClick={() => router.push(`/tasks/${task._id}`)}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.borderColor = '#063c7a'
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08)'
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.borderColor = '#e0e0e0'
+                    e.currentTarget.style.boxShadow = 'none'
+                  }}
                 >
                   <div
                     style={{
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'start',
-                      marginBottom: '1rem',
+                      marginBottom: '0.75rem',
+                      gap: '1rem',
                     }}
                   >
-                    <div>
-                      <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>{task.title}</h3>
-                      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                    <div style={{ flex: 1 }}>
+                      <h3
+                        style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.75rem', color: '#1a1a1a' }}
+                      >
+                        {task.title}
+                      </h3>
+                      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                         <span
                           style={{
-                            padding: '0.25rem 0.75rem',
-                            background: '#e7f3ff',
-                            color: '#0066cc',
-                            borderRadius: '20px',
-                            fontSize: '0.875rem',
+                            padding: '0.375rem 0.75rem',
+                            background: '#e3f2fd',
+                            color: '#063c7a',
+                            borderRadius: '6px',
+                            fontSize: '0.75rem',
                             fontWeight: '600',
                           }}
                         >
-                          {task.category}
+                          {task.category.replace('_', ' ')}
                         </span>
                         <span
                           style={{
-                            padding: '0.25rem 0.75rem',
-                            background: task.status === 'OPEN' ? '#d4edda' : '#fff3cd',
-                            color: task.status === 'OPEN' ? '#155724' : '#856404',
-                            borderRadius: '20px',
-                            fontSize: '0.875rem',
+                            padding: '0.375rem 0.75rem',
+                            background: task.status === 'OPEN' ? '#d1fae5' : '#fff3cd',
+                            color: task.status === 'OPEN' ? '#065f46' : '#92400e',
+                            borderRadius: '6px',
+                            fontSize: '0.75rem',
                             fontWeight: '600',
                           }}
                         >
-                          {task.status}
+                          {task.status.replace('_', ' ')}
                         </span>
                       </div>
                     </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#28a745' }}>৳{task.budget}</div>
-                      <div style={{ fontSize: '0.875rem', color: '#6c757d' }}>BDT</div>
+                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                      <div
+                        style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', justifyContent: 'flex-end' }}
+                      >
+                        <DollarSign size={20} color="#10b981" strokeWidth={2} />
+                        <span style={{ fontSize: '1.5rem', fontWeight: '700', color: '#10b981' }}>৳{task.budget}</span>
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#999', marginTop: '0.25rem' }}>BDT</div>
                     </div>
                   </div>
 
-                  <p style={{ color: '#495057', marginBottom: '1rem', lineHeight: '1.6' }}>
+                  <p style={{ color: '#666', marginBottom: '1rem', lineHeight: '1.5', fontSize: '0.9375rem' }}>
                     {task.description.length > 150 ? task.description.substring(0, 150) + '...' : task.description}
                   </p>
 
                   <div
-                    style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', fontSize: '0.9rem', color: '#6c757d' }}
+                    style={{
+                      display: 'flex',
+                      gap: '1.5rem',
+                      flexWrap: 'wrap',
+                      fontSize: '0.875rem',
+                      color: '#666',
+                      marginBottom: '1rem',
+                    }}
                   >
-                    <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
                       📍 {task.location?.city}, {task.location?.district}
                     </div>
-                    {task.estimatedDuration && <div>⏱️ {task.estimatedDuration}h</div>}
-                    {task.deadline && <div>📅 {new Date(task.deadline).toLocaleDateString()}</div>}
+                    {task.estimatedDuration && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                        <Clock size={14} color="#063c7a" strokeWidth={2} />
+                        {task.estimatedDuration}h
+                      </div>
+                    )}
+                    {task.deadline && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                        📅 {new Date(task.deadline).toLocaleDateString()}
+                      </div>
+                    )}
                   </div>
+
+                  <button
+                    onClick={e => {
+                      e.stopPropagation()
+                      router.push(`/tasks/${task._id}`)
+                    }}
+                    style={{
+                      padding: '0.5rem 1rem',
+                      background: '#063c7a',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '0.8125rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.375rem',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.background = '#084d99'
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.background = '#063c7a'
+                    }}
+                  >
+                    <Eye size={14} strokeWidth={2} />
+                    View Details & Apply
+                  </button>
                 </div>
               ))}
             </div>

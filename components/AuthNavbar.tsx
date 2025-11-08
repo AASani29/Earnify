@@ -1,0 +1,192 @@
+'use client'
+
+import { useRouter } from 'next/navigation'
+import { useJWTAuthContext } from '@/config/Auth'
+
+export default function AuthNavbar() {
+  const router = useRouter()
+  const { user, logout, isLoggedIn } = useJWTAuthContext()
+
+  const handleLogout = async () => {
+    await logout()
+    router.push('/login')
+  }
+
+  return (
+    <nav
+      style={{
+        padding: '1.5rem 2rem',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderBottom: '1px solid #f0f0f0',
+        background: '#ffffff',
+        maxWidth: '1400px',
+        margin: '0 auto',
+        width: '100%',
+      }}
+    >
+      {/* Logo - Slightly to the right */}
+      <div style={{ display: 'flex', alignItems: 'center', marginLeft: '10%' }}>
+        <img
+          src="/Earnify-Logo.png"
+          alt="Earnify"
+          style={{
+            height: '40px',
+            width: 'auto',
+            maxWidth: '150px',
+            objectFit: 'contain',
+            cursor: 'pointer',
+          }}
+          onClick={() => router.push('/')}
+          onError={e => {
+            console.error('Logo failed to load')
+            e.currentTarget.style.display = 'none'
+          }}
+        />
+      </div>
+
+      {/* Buttons - Slightly to the left of center */}
+      <div
+        style={{
+          display: 'flex',
+          gap: '1rem',
+          alignItems: 'center',
+          marginRight: '10%',
+        }}
+      >
+        {isLoggedIn === true && user ? (
+          <>
+            <button
+              onClick={() => {
+                if (user.role === 'WORKER') {
+                  router.push('/dashboard/worker')
+                } else if (user.role === 'CLIENT') {
+                  router.push('/dashboard/client')
+                } else if (user.role === 'ADMIN') {
+                  router.push('/dashboard/admin')
+                }
+              }}
+              style={{
+                padding: '0.75rem 1.5rem',
+                background: 'transparent',
+                border: '1px solid #e0e0e0',
+                borderRadius: '8px',
+                fontSize: '1rem',
+                fontWeight: '500',
+                color: '#1a1a1a',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = '#063c7a'
+                e.currentTarget.style.color = '#063c7a'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = '#e0e0e0'
+                e.currentTarget.style.color = '#1a1a1a'
+              }}
+            >
+              Dashboard
+            </button>
+            <button
+              onClick={() => router.push('/profile')}
+              style={{
+                padding: '0.75rem 1.5rem',
+                background: 'transparent',
+                border: '1px solid #e0e0e0',
+                borderRadius: '8px',
+                fontSize: '1rem',
+                fontWeight: '500',
+                color: '#1a1a1a',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = '#063c7a'
+                e.currentTarget.style.color = '#063c7a'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = '#e0e0e0'
+                e.currentTarget.style.color = '#1a1a1a'
+              }}
+            >
+              Profile
+            </button>
+            <button
+              onClick={handleLogout}
+              style={{
+                padding: '0.75rem 1.5rem',
+                background: '#dc3545',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '1rem',
+                fontWeight: '600',
+                color: 'white',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = '#c82333'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = '#dc3545'
+              }}
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={() => router.push('/login')}
+              style={{
+                padding: '0.75rem 1.5rem',
+                background: 'transparent',
+                border: '1px solid #e0e0e0',
+                borderRadius: '8px',
+                fontSize: '1rem',
+                fontWeight: '500',
+                color: '#1a1a1a',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = '#063c7a'
+                e.currentTarget.style.color = '#063c7a'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = '#e0e0e0'
+                e.currentTarget.style.color = '#1a1a1a'
+              }}
+            >
+              Sign In
+            </button>
+            <button
+              onClick={() => router.push('/signup')}
+              style={{
+                padding: '0.75rem 1.5rem',
+                background: '#063c7a',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '1rem',
+                fontWeight: '600',
+                color: 'white',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = '#084d99'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = '#063c7a'
+              }}
+            >
+              Get Started
+            </button>
+          </>
+        )}
+      </div>
+    </nav>
+  )
+}
