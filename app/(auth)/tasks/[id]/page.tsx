@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useJWTAuthContext } from '@/config/Auth'
 import AuthNavbar from '@/components/AuthNavbar'
+import ReviewForm from '@/components/ReviewForm'
 import {
   FileText,
   DollarSign,
@@ -39,6 +40,9 @@ export default function TaskDetailsPage() {
   const [submitting, setSubmitting] = useState(false)
   const [aiRecommendations, setAiRecommendations] = useState<any[]>([])
   const [loadingRecommendations, setLoadingRecommendations] = useState(false)
+  const [showReviewForm, setShowReviewForm] = useState(false)
+  const [existingReview, setExistingReview] = useState<any>(null)
+  const [loadingReview, setLoadingReview] = useState(false)
 
   // Get access token from controller
   const getAccessToken = () => controller.getAccessToken()
@@ -50,6 +54,9 @@ export default function TaskDetailsPage() {
   useEffect(() => {
     if (task && user && user.role === 'CLIENT' && task.clientId._id === user.id) {
       fetchAIRecommendations()
+      if (task.status === 'COMPLETED' && task.assignedWorkerId) {
+        checkExistingReview()
+      }
     }
   }, [task, user])
 
@@ -91,6 +98,30 @@ export default function TaskDetailsPage() {
     } finally {
       setLoadingRecommendations(false)
     }
+  }
+
+  const checkExistingReview = async () => {
+    try {
+      setLoadingReview(true)
+      const response = await fetch(`/api/reviews?taskId=${params.id}`)
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.reviews && data.reviews.length > 0) {
+          setExistingReview(data.reviews[0])
+        }
+      }
+    } catch (error) {
+      console.error('Error checking existing review:', error)
+    } finally {
+      setLoadingReview(false)
+    }
+  }
+
+  const handleReviewSubmitSuccess = () => {
+    setShowReviewForm(false)
+    checkExistingReview()
+    fetchTask() // Refresh task data
   }
 
   const handleApplicationChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -799,6 +830,113 @@ export default function TaskDetailsPage() {
                       )}
                     </div>
                   ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Review Section - For Clients on Completed Tasks */}
+          {isClient && isOwner && task.status === 'COMPLETED' && task.assignedWorkerId && (
+            <div style={{ marginTop: '2rem' }}>
+              {loadingReview ? (
+                <div style={{ textAlign: 'center', padding: '2rem' }}>
+                  <Loader2 size={32} color="#063c7a" strokeWidth={2} style={{ animation: 'spin 1s linear infinite' }} />
+                  <p style={{ color: '#666', marginTop: '1rem' }}>Loading review...</p>
+                </div>
+              ) : existingReview ? (
+                <div
+                  style={{
+                    background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+                    padding: '2rem',
+                    borderRadius: '12px',
+                    border: '1px solid #86efac',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                    <CheckCircle size={24} color="#16a34a" strokeWidth={2} />
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1a1a1a', margin: 0 }}>
+                      Review Submitted
+                    </h3>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <Star
+                        key={star}
+                        size={24}
+                        fill={star <= existingReview.rating ? '#fbbf24' : 'none'}
+                        color={star <= existingReview.rating ? '#fbbf24' : '#d1d5db'}
+                        strokeWidth={2}
+                      />
+                    ))}
+                    <span style={{ marginLeft: '0.5rem', fontSize: '1.125rem', fontWeight: '600', color: '#1a1a1a' }}>
+                      {existingReview.rating}/5
+                    </span>
+                  </div>
+                  {existingReview.comment && (
+                    <p style={{ color: '#374151', lineHeight: '1.6', marginBottom: '1rem' }}>
+                      "{existingReview.comment}"
+                    </p>
+                  )}
+                  <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                    Reviewed on {new Date(existingReview.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
+              ) : showReviewForm ? (
+                <ReviewForm
+                  taskId={task._id}
+                  workerId={task.assignedWorkerId._id}
+                  workerName={`${task.assignedWorkerId.firstName} ${task.assignedWorkerId.lastName}`}
+                  onSubmitSuccess={handleReviewSubmitSuccess}
+                  onCancel={() => setShowReviewForm(false)}
+                />
+              ) : (
+                <div
+                  style={{
+                    background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+                    padding: '2rem',
+                    borderRadius: '12px',
+                    border: '1px solid #fcd34d',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '1.5rem',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                      <Star size={24} color="#f59e0b" fill="#f59e0b" strokeWidth={2} />
+                      <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1a1a1a', margin: 0 }}>
+                        Review {task.assignedWorkerId.firstName}
+                      </h3>
+                    </div>
+                    <p style={{ color: '#78350f', margin: 0 }}>
+                      This task is completed. Share your experience to help other clients!
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowReviewForm(true)}
+                    style={{
+                      background: '#063c7a',
+                      color: 'white',
+                      padding: '0.75rem 1.5rem',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      fontSize: '1rem',
+                      transition: 'all 0.2s',
+                      whiteSpace: 'nowrap',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.background = '#084d99'
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.background = '#063c7a'
+                    }}
+                  >
+                    Write Review
+                  </button>
                 </div>
               )}
             </div>

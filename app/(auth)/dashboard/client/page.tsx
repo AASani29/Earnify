@@ -16,6 +16,7 @@ import {
   Users,
   TrendingUp,
   DollarSign,
+  Star,
 } from 'lucide-react'
 
 export default function ClientDashboardPage() {
@@ -25,6 +26,8 @@ export default function ClientDashboardPage() {
   const [applications, setApplications] = useState<any[]>([])
   const [selectedTask, setSelectedTask] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [reviews, setReviews] = useState<any[]>([])
+  const [loadingReviews, setLoadingReviews] = useState(false)
 
   // Get access token from controller
   const getAccessToken = () => controller.getAccessToken()
@@ -43,6 +46,7 @@ export default function ClientDashboardPage() {
   useEffect(() => {
     if (user && user.role === 'CLIENT') {
       fetchTasks()
+      fetchReviews()
     }
   }, [user])
 
@@ -68,6 +72,24 @@ export default function ClientDashboardPage() {
       console.error('Error fetching tasks:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchReviews = async () => {
+    if (!user) return
+
+    try {
+      setLoadingReviews(true)
+      const response = await fetch(`/api/reviews?clientId=${user.id}`)
+
+      if (response.ok) {
+        const data = await response.json()
+        setReviews(data.reviews || [])
+      }
+    } catch (error) {
+      console.error('Error fetching reviews:', error)
+    } finally {
+      setLoadingReviews(false)
     }
   }
 
@@ -831,6 +853,199 @@ export default function ClientDashboardPage() {
             </div>
           </div>
         )}
+
+        {/* Reviews Section */}
+        <div
+          style={{
+            background: 'white',
+            borderRadius: '16px',
+            padding: '2rem',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+            marginTop: '2rem',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+            <div
+              style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Star size={24} color="white" strokeWidth={2} />
+            </div>
+            <div>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1a1a1a', margin: 0 }}>My Reviews</h2>
+              <p style={{ color: '#666', fontSize: '0.875rem', margin: 0 }}>Reviews you've submitted for workers</p>
+            </div>
+          </div>
+
+          {loadingReviews ? (
+            <div style={{ textAlign: 'center', padding: '2rem' }}>
+              <p style={{ color: '#666' }}>Loading reviews...</p>
+            </div>
+          ) : reviews.length === 0 ? (
+            <div
+              style={{
+                textAlign: 'center',
+                padding: '3rem',
+                background: '#f8f9fa',
+                borderRadius: '12px',
+                border: '2px dashed #dee2e6',
+              }}
+            >
+              <Star size={48} color="#ccc" strokeWidth={2} style={{ margin: '0 auto 1rem' }} />
+              <p style={{ color: '#666', fontSize: '1rem', marginBottom: '0.5rem' }}>No reviews yet</p>
+              <p style={{ color: '#999', fontSize: '0.875rem' }}>
+                Complete tasks and review workers to help the community!
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gap: '1rem' }}>
+              {reviews.map((review: any) => (
+                <div
+                  key={review._id}
+                  style={{
+                    background: '#f8f9fa',
+                    padding: '1.5rem',
+                    borderRadius: '12px',
+                    border: '1px solid #e0e0e0',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      marginBottom: '1rem',
+                      flexWrap: 'wrap',
+                      gap: '1rem',
+                    }}
+                  >
+                    <div style={{ flex: 1 }}>
+                      {/* Worker Info */}
+                      <div style={{ marginBottom: '0.75rem' }}>
+                        <div style={{ fontSize: '0.875rem', color: '#666', marginBottom: '0.25rem' }}>Worker</div>
+                        <div style={{ fontWeight: '600', color: '#1a1a1a', fontSize: '1rem' }}>
+                          {review.workerId?.firstName} {review.workerId?.lastName}
+                        </div>
+                      </div>
+
+                      {/* Task Info */}
+                      {review.taskId && (
+                        <div style={{ marginBottom: '0.75rem' }}>
+                          <div style={{ fontSize: '0.875rem', color: '#666', marginBottom: '0.25rem' }}>Task</div>
+                          <div style={{ fontWeight: '600', color: '#1a1a1a', fontSize: '0.875rem' }}>
+                            {review.taskId.title}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Rating */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        {[1, 2, 3, 4, 5].map(star => (
+                          <Star
+                            key={star}
+                            size={20}
+                            fill={star <= review.rating ? '#fbbf24' : 'none'}
+                            color={star <= review.rating ? '#fbbf24' : '#d1d5db'}
+                            strokeWidth={2}
+                          />
+                        ))}
+                        <span style={{ marginLeft: '0.25rem', fontWeight: '600', color: '#1a1a1a' }}>
+                          {review.rating}/5
+                        </span>
+                      </div>
+                    </div>
+
+                    <div style={{ fontSize: '0.875rem', color: '#666' }}>
+                      {new Date(review.createdAt).toLocaleDateString()}
+                    </div>
+                  </div>
+
+                  {/* Comment */}
+                  {review.comment && (
+                    <div
+                      style={{
+                        background: 'white',
+                        padding: '1rem',
+                        borderRadius: '8px',
+                        marginBottom: '1rem',
+                        borderLeft: '3px solid #fbbf24',
+                      }}
+                    >
+                      <p style={{ color: '#374151', lineHeight: '1.6', margin: 0 }}>"{review.comment}"</p>
+                    </div>
+                  )}
+
+                  {/* Detailed Ratings */}
+                  {(review.professionalism || review.communication || review.quality || review.timeliness) && (
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                        gap: '1rem',
+                        marginBottom: '1rem',
+                      }}
+                    >
+                      {review.professionalism && (
+                        <div>
+                          <div style={{ fontSize: '0.75rem', color: '#666', marginBottom: '0.25rem' }}>
+                            Professionalism
+                          </div>
+                          <div style={{ fontWeight: '600', color: '#1a1a1a' }}>{review.professionalism}/5</div>
+                        </div>
+                      )}
+                      {review.communication && (
+                        <div>
+                          <div style={{ fontSize: '0.75rem', color: '#666', marginBottom: '0.25rem' }}>
+                            Communication
+                          </div>
+                          <div style={{ fontWeight: '600', color: '#1a1a1a' }}>{review.communication}/5</div>
+                        </div>
+                      )}
+                      {review.quality && (
+                        <div>
+                          <div style={{ fontSize: '0.75rem', color: '#666', marginBottom: '0.25rem' }}>Quality</div>
+                          <div style={{ fontWeight: '600', color: '#1a1a1a' }}>{review.quality}/5</div>
+                        </div>
+                      )}
+                      {review.timeliness && (
+                        <div>
+                          <div style={{ fontSize: '0.75rem', color: '#666', marginBottom: '0.25rem' }}>Timeliness</div>
+                          <div style={{ fontWeight: '600', color: '#1a1a1a' }}>{review.timeliness}/5</div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Would Hire Again Badge */}
+                  {review.wouldHireAgain && (
+                    <div
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        background: '#dcfce7',
+                        color: '#16a34a',
+                        padding: '0.5rem 1rem',
+                        borderRadius: '20px',
+                        fontSize: '0.875rem',
+                        fontWeight: '600',
+                      }}
+                    >
+                      <CheckCircle size={16} />
+                      Would hire again
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

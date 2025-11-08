@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
-    const clientId = decoded.userId
+    const clientId = decoded.id // Token contains 'id' not 'userId'
     await dbConnect()
 
     // Verify user is a client
