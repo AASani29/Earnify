@@ -7,22 +7,22 @@ import { TokenPayload } from './types'
 // This is acceptable for development but should be replaced with persistent storage in production
 
 export const generateAccessToken = (payload: TokenPayload): string => {
-  return jwt.sign(payload, config.jwtAccessSecret, {
+  return jwt.sign(payload, config.jwtAccessSecret as jwt.Secret, {
     expiresIn: config.accessTokenExpiry,
-  })
+  } as jwt.SignOptions)
 }
 
 export const generateRefreshToken = (payload: TokenPayload): string => {
-  const token = jwt.sign(payload, config.jwtRefreshSecret, {
+  const token = jwt.sign(payload, config.jwtRefreshSecret as jwt.Secret, {
     expiresIn: config.refreshTokenExpiry,
-  })
+  } as jwt.SignOptions)
   // TODO: Store in Redis/Database for production
   return token
 }
 
 export const verifyAccessToken = (token: string): TokenPayload | null => {
   try {
-    return jwt.verify(token, config.jwtAccessSecret) as TokenPayload
+    return jwt.verify(token, config.jwtAccessSecret as string) as TokenPayload
   } catch (error) {
     return null
   }
@@ -32,7 +32,7 @@ export const verifyRefreshToken = (token: string): TokenPayload | null => {
   try {
     // Verify the token signature and expiration
     // Skip whitelist check to avoid server restart issues
-    return jwt.verify(token, config.jwtRefreshSecret) as TokenPayload
+    return jwt.verify(token, config.jwtRefreshSecret as string) as TokenPayload
   } catch (error) {
     return null
   }

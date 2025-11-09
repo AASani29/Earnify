@@ -21,7 +21,7 @@ if (!cached) {
 
 async function connectDB() {
   if (cached.conn) {
-    console.log('Using cached MongoDB connection to:', cached.conn.connection.db.databaseName)
+    console.log('Using cached MongoDB connection to:', (cached.conn as any).connection.db.databaseName)
     return cached.conn
   }
 
@@ -35,9 +35,9 @@ async function connectDB() {
 
     console.log('Connecting to MongoDB:', MONGODB_URI.replace(/\/\/([^:]+):([^@]+)@/, '//$1:****@'))
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log('✅ MongoDB connected successfully to database:', mongoose.connection.db.databaseName)
+      console.log('✅ MongoDB connected successfully to database:', (mongoose as any).connection.db.databaseName)
       return mongoose
-    })
+    }) as any
   }
 
   try {

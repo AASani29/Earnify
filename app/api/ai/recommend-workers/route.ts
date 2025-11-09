@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Get reviews for all workers
-    const workerUserIds = workerProfiles.map(p => p.userId._id)
+    const workerUserIds = workerProfiles.map(p => (p.userId as any)._id)
     const allReviews = await Review.find({ workerId: { $in: workerUserIds } })
       .select('workerId rating comment skills professionalism communication quality')
       .lean()
@@ -87,17 +87,20 @@ export async function GET(req: NextRequest) {
     })
 
     // Prepare data for AI recommendation
-    const workersForAI = workerProfiles.map(profile => ({
-      _id: profile._id.toString(),
-      userId: profile.userId._id.toString(),
-      skills: profile.skills || [],
-      location: profile.location,
-      rating: profile.rating,
-      hourlyRate: profile.hourlyRate,
-      completedTasks: profile.completedTasks,
-      experience: profile.experience,
-      reviews: reviewsByWorker.get(profile.userId._id.toString()) || [],
-    }))
+    const workersForAI = workerProfiles.map(profile => {
+      const populatedUser = profile.userId as any
+      return {
+        _id: profile._id.toString(),
+        userId: populatedUser._id.toString(),
+        skills: profile.skills || [],
+        location: profile.location,
+        rating: profile.rating,
+        hourlyRate: profile.hourlyRate,
+        completedTasks: profile.completedTasks,
+        experience: profile.experience,
+        reviews: reviewsByWorker.get(populatedUser._id.toString()) || [],
+      }
+    })
 
     const taskForAI = {
       title: task.title,
@@ -116,7 +119,7 @@ export async function GET(req: NextRequest) {
     const recommendationsWithScores = await Promise.all(
       recommendedWorkerIds.slice(0, 10).map(async workerId => {
         const profile = workerProfiles.find(
-          p => p.userId._id.toString() === workerId
+          p => (p.userId as any)._id.toString() === workerId
         )
         if (!profile) return null
 
@@ -135,12 +138,15 @@ export async function GET(req: NextRequest) {
           }
         )
 
+        // Type assertion for populated userId
+        const populatedUser = profile.userId as any
+
         return {
           worker: {
-            userId: profile.userId._id,
-            firstName: profile.userId.firstName,
-            lastName: profile.userId.lastName,
-            email: profile.userId.email,
+            userId: populatedUser._id,
+            firstName: populatedUser.firstName,
+            lastName: populatedUser.lastName,
+            email: populatedUser.email,
             bio: profile.bio,
             skills: profile.skills,
             experience: profile.experience,

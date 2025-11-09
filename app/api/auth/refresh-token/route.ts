@@ -52,6 +52,8 @@ export async function POST(request: NextRequest) {
       profileCompleted: dbUser.profileCompleted,
       isVerified: dbUser.isVerified,
       phoneNumber: dbUser.phoneNumber,
+      createdAt: dbUser.createdAt.toISOString(),
+      updatedAt: dbUser.updatedAt.toISOString(),
     }
 
     const tokenPayload = {

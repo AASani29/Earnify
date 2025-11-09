@@ -49,7 +49,7 @@ const bangladeshDistricts = [
 
 export default function CreateTaskPage() {
   const router = useRouter()
-  const { user, controller, isLoading } = useJWTAuthContext()
+  const { user, controller, isLoggedIn } = useJWTAuthContext()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 

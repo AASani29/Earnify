@@ -5,11 +5,11 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
 export default function AdminDashboardPage() {
-  const { user, logout, isLoading } = useJWTAuthContext()
+  const { user, logout, isLoggedIn } = useJWTAuthContext()
   const router = useRouter()
 
   useEffect(() => {
-    if (!isLoading && user && user.role !== 'ADMIN') {
+    if (isLoggedIn !== null && user && user.role !== 'ADMIN') {
       // Redirect to appropriate dashboard if not an admin
       if (user.role === 'WORKER') {
         router.push('/dashboard/worker')
@@ -17,14 +17,14 @@ export default function AdminDashboardPage() {
         router.push('/dashboard/client')
       }
     }
-  }, [user, isLoading, router])
+  }, [user, isLoggedIn, router])
 
   const handleLogout = async () => {
     await logout()
     router.push('/login')
   }
 
-  if (isLoading) {
+  if (isLoggedIn === null) {
     return (
       <div className="container">
         <div className="card">Loading...</div>
@@ -125,4 +125,3 @@ export default function AdminDashboardPage() {
     </div>
   )
 }
-

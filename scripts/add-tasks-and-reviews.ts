@@ -46,7 +46,8 @@ async function addTasksAndReviews() {
     ecommerce: await User.findOne({ email: 'ecommerce@example.com' }),
   }
 
-  if (!workers.rahim || !clients.techcorp) {
+  if (!workers.rahim || !workers.fatima || !workers.karim || !workers.nadia || !workers.hassan ||
+      !clients.techcorp || !clients.designstudio || !clients.ecommerce) {
     console.error('❌ Required users not found. Run seed-data.ts first.')
     return
   }
