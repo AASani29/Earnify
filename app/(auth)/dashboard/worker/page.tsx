@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import AuthNavbar from '@/components/AuthNavbar'
 import WorkerInProgressTasks from '@/components/WorkerInProgressTasks'
+import SupportChatbot from '@/components/SupportChatbot'
 import {
   Briefcase,
   Search,
@@ -1484,6 +1485,9 @@ export default function WorkerDashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Support Chatbot */}
+      <SupportChatbot />
     </div>
   )
 }

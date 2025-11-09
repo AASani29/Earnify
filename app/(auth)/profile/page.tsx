@@ -17,6 +17,8 @@ import {
   Loader2,
   CheckCircle,
   AlertCircle,
+  Award,
+  Plus,
 } from 'lucide-react'
 
 export default function ProfilePage() {
@@ -29,6 +31,7 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [skillInput, setSkillInput] = useState('')
 
   const getAccessToken = () => controller.getAccessToken()
 
@@ -84,12 +87,31 @@ export default function ProfilePage() {
     setFormData((prev: any) => ({ ...prev, [name]: value }))
   }
 
-  const handleSkillsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const skills = e.target.value
-      .split(',')
-      .map(s => s.trim())
-      .filter(s => s)
-    setFormData((prev: any) => ({ ...prev, skills }))
+  const handleAddSkill = () => {
+    const trimmedSkill = skillInput.trim()
+    if (trimmedSkill && !formData.skills?.includes(trimmedSkill)) {
+      const currentSkills = formData.skills || profile?.skills || []
+      setFormData((prev: any) => ({
+        ...prev,
+        skills: [...currentSkills, trimmedSkill],
+      }))
+      setSkillInput('')
+    }
+  }
+
+  const handleRemoveSkill = (skillToRemove: string) => {
+    const currentSkills = formData.skills || profile?.skills || []
+    setFormData((prev: any) => ({
+      ...prev,
+      skills: currentSkills.filter((skill: string) => skill !== skillToRemove),
+    }))
+  }
+
+  const handleSkillInputKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleAddSkill()
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -500,6 +522,159 @@ export default function ProfilePage() {
                     e.currentTarget.style.boxShadow = 'none'
                   }}
                 />
+              </div>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    fontWeight: '600',
+                    marginBottom: '0.5rem',
+                    fontSize: '0.875rem',
+                    color: '#1a1a1a',
+                  }}
+                >
+                  <Award size={16} color="#063c7a" strokeWidth={2} />
+                  Skills
+                </label>
+
+                {/* Skills Input with Add Button */}
+                {editing && (
+                  <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+                    <input
+                      type="text"
+                      value={skillInput}
+                      onChange={e => setSkillInput(e.target.value)}
+                      onKeyPress={handleSkillInputKeyPress}
+                      placeholder="e.g., JavaScript, React, Python"
+                      style={{
+                        flex: 1,
+                        padding: '0.75rem 1rem',
+                        fontSize: '0.9375rem',
+                        border: '1px solid #e0e0e0',
+                        borderRadius: '8px',
+                        outline: 'none',
+                        transition: 'all 0.2s',
+                        boxSizing: 'border-box',
+                      }}
+                      onFocus={e => {
+                        e.currentTarget.style.borderColor = '#063c7a'
+                        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(6, 60, 122, 0.1)'
+                      }}
+                      onBlur={e => {
+                        e.currentTarget.style.borderColor = '#e0e0e0'
+                        e.currentTarget.style.boxShadow = 'none'
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddSkill}
+                      disabled={!skillInput.trim()}
+                      style={{
+                        padding: '0.75rem 1.25rem',
+                        background: skillInput.trim() ? 'linear-gradient(135deg, #063c7a 0%, #084d99 100%)' : '#e9ecef',
+                        color: skillInput.trim() ? 'white' : '#6c757d',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontWeight: '600',
+                        fontSize: '0.9375rem',
+                        cursor: skillInput.trim() ? 'pointer' : 'not-allowed',
+                        transition: 'all 0.2s',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                      }}
+                      onMouseEnter={e => {
+                        if (skillInput.trim()) {
+                          e.currentTarget.style.transform = 'translateY(-2px)'
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(6, 60, 122, 0.3)'
+                        }
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.transform = 'translateY(0)'
+                        e.currentTarget.style.boxShadow = 'none'
+                      }}
+                    >
+                      <Plus size={18} strokeWidth={2} />
+                      Add
+                    </button>
+                  </div>
+                )}
+
+                {/* Display Skills as Chips */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  {(formData.skills || profile?.skills || []).length > 0 ? (
+                    (formData.skills || profile?.skills || []).map((skill: string, index: number) => (
+                      <div
+                        key={index}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          padding: '0.5rem 0.75rem',
+                          background: 'linear-gradient(135deg, #063c7a 0%, #084d99 100%)',
+                          color: 'white',
+                          borderRadius: '20px',
+                          fontSize: '0.875rem',
+                          fontWeight: '500',
+                        }}
+                      >
+                        <span>{skill}</span>
+                        {editing && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveSkill(skill)}
+                            style={{
+                              background: 'rgba(255, 255, 255, 0.2)',
+                              border: 'none',
+                              borderRadius: '50%',
+                              width: '20px',
+                              height: '20px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              padding: 0,
+                              transition: 'all 0.2s',
+                            }}
+                            onMouseEnter={e => {
+                              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)'
+                            }}
+                            onMouseLeave={e => {
+                              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'
+                            }}
+                          >
+                            <X size={14} strokeWidth={2} />
+                          </button>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <p
+                      style={{
+                        fontSize: '0.875rem',
+                        color: '#6c757d',
+                        fontStyle: 'italic',
+                      }}
+                    >
+                      {editing ? 'No skills added yet. Add your skills above.' : 'No skills added'}
+                    </p>
+                  )}
+                </div>
+
+                <p
+                  style={{
+                    fontSize: '0.8125rem',
+                    color: '#6c757d',
+                    marginTop: '0.75rem',
+                  }}
+                >
+                  {editing
+                    ? 'Add skills one by one. These skills are used for AI task recommendations.'
+                    : 'These skills are used for AI task recommendations.'}
+                </p>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>

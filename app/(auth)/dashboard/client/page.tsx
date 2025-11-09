@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import AuthNavbar from '@/components/AuthNavbar'
 import ClientInProgressTasks from '@/components/ClientInProgressTasks'
+import SupportChatbot from '@/components/SupportChatbot'
 import {
   Briefcase,
   CheckCircle,
@@ -283,12 +284,9 @@ export default function ClientDashboardPage() {
         {/* Header */}
         <div style={{ marginBottom: '2rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            
             <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#1a1a1a', margin: 0 }}>Client Dashboard</h1>
           </div>
-          <p style={{ color: '#666', fontSize: '1rem' }}>
-            Manage your tasks and hire the best workers
-          </p>
+          <p style={{ color: '#666', fontSize: '1rem' }}>Manage your tasks and hire the best workers</p>
 
           {/* Tabs */}
           <div
@@ -1283,6 +1281,9 @@ export default function ClientDashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Support Chatbot */}
+      <SupportChatbot />
     </div>
   )
 }
