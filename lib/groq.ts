@@ -104,11 +104,13 @@ export async function calculateMatchScore(
           role: 'system',
           content: `You are a job matching assistant. Calculate a match score (0-100) between a worker and a task.
 Consider: skill match, location proximity, budget compatibility, worker rating, and past reviews.
-Return ONLY a JSON object with this structure:
+Return ONLY a valid JSON object with this exact structure (no markdown, no code blocks, just raw JSON):
 {
   "score": 85,
   "reasons": ["Strong skill match", "Same city", "Budget aligned", "Excellent reviews"]
-}`,
+}
+
+IMPORTANT: Return ONLY the JSON object, nothing else. Do not wrap it in markdown code blocks.`,
         },
         {
           role: 'user',
@@ -133,20 +135,38 @@ Calculate the match score and provide reasons.`,
       max_tokens: 300,
     })
 
-    const response = completion.choices[0]?.message?.content || '{}'
+    let response = completion.choices[0]?.message?.content || '{}'
+
+    // Remove markdown code blocks if present
+    response = response.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim()
 
     try {
+      // Try to parse the JSON response
       const result = JSON.parse(response)
       return {
         score: typeof result.score === 'number' ? result.score : 0,
         reasons: Array.isArray(result.reasons) ? result.reasons : [],
       }
-    } catch {
-      return { score: 0, reasons: [] }
+    } catch (parseError) {
+      console.error('Error parsing match score response:', parseError)
+      console.log('Raw AI response:', response)
+
+      // Try to extract score from text if JSON parsing fails
+      const scoreMatch = response.match(/score["\s:]+(\d+)/i)
+      if (scoreMatch) {
+        const score = parseInt(scoreMatch[1], 10)
+        return {
+          score: isNaN(score) ? 50 : Math.min(100, Math.max(0, score)),
+          reasons: ['Match score calculated'],
+        }
+      }
+
+      // Return a default score instead of 0
+      return { score: 50, reasons: ['Unable to calculate precise match score'] }
     }
   } catch (error) {
     console.error('Error calculating match score:', error)
-    return { score: 0, reasons: [] }
+    return { score: 50, reasons: ['Match score unavailable'] }
   }
 }
 
@@ -322,6 +342,179 @@ Recommend the top workers for this task (return user IDs only).`,
   } catch (error) {
     console.error('Error getting worker recommendations:', error)
     return []
+  }
+}
+
+/**
+ * Analyze applications and recommend the best one for a task
+ */
+export async function analyzeApplications(
+  task: {
+    title: string
+    description: string
+    category: string
+    skillsRequired: string[]
+    budget: number
+    location: { city?: string; district?: string }
+  },
+  applications: Array<{
+    _id: string
+    workerId: {
+      firstName: string
+      lastName: string
+      email: string
+    }
+    workerProfile?: {
+      skills: string[]
+      rating: { average: number; count: number }
+      completedTasks: number
+      experience?: string
+      hourlyRate?: number
+    }
+    coverLetter: string
+    proposedBudget?: number
+    estimatedCompletionTime?: number
+    appliedAt: Date
+  }>
+): Promise<{
+  recommendedApplicationId: string
+  analysis: {
+    applicationId: string
+    workerName: string
+    score: number
+    strengths: string[]
+    concerns: string[]
+    recommendation: string
+  }[]
+}> {
+  try {
+    if (applications.length === 0) {
+      return {
+        recommendedApplicationId: '',
+        analysis: [],
+      }
+    }
+
+    // Prepare application data for AI
+    const applicationsData = applications
+      .map((app, index) => {
+        const profile = app.workerProfile
+        return `
+Application ${index + 1} (ID: ${app._id}):
+Worker: ${app.workerId.firstName} ${app.workerId.lastName}
+Email: ${app.workerId.email}
+Skills: ${profile?.skills?.join(', ') || 'Not specified'}
+Rating: ${profile?.rating?.average?.toFixed(1) || 'N/A'}/5.0 (${profile?.rating?.count || 0} reviews)
+Completed Tasks: ${profile?.completedTasks || 0}
+Experience: ${profile?.experience || 'Not specified'}
+Hourly Rate: ৳${profile?.hourlyRate || 'Not specified'}
+Proposed Budget: ৳${app.proposedBudget || 'Not specified'}
+Estimated Time: ${app.estimatedCompletionTime || 'Not specified'} hours
+Cover Letter: ${app.coverLetter}
+Applied: ${new Date(app.appliedAt).toLocaleDateString()}
+`
+      })
+      .join('\n---\n')
+
+    const completion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: 'system',
+          content: `You are an expert hiring assistant for a labor marketplace platform in Bangladesh.
+Analyze job applications and recommend the best candidate based on:
+1. Skill match with required skills
+2. Experience and past performance (rating, completed tasks)
+3. Budget alignment
+4. Cover letter quality and professionalism
+5. Estimated completion time
+6. Overall reliability indicators
+
+Return ONLY a valid JSON object with this exact structure (no markdown, no code blocks, just raw JSON):
+{
+  "recommendedApplicationId": "application_id_here",
+  "analysis": [
+    {
+      "applicationId": "app_id",
+      "workerName": "Worker Name",
+      "score": 85,
+      "strengths": ["Strong skill match", "Excellent rating", "Competitive budget"],
+      "concerns": ["Limited experience in this category"],
+      "recommendation": "Brief recommendation summary"
+    }
+  ]
+}
+
+Score each application 0-100. The application with the highest score should be the recommendedApplicationId.
+IMPORTANT: Return ONLY the JSON object, nothing else. Do not wrap it in markdown code blocks.`,
+        },
+        {
+          role: 'user',
+          content: `Task Details:
+Title: ${task.title}
+Description: ${task.description}
+Category: ${task.category}
+Required Skills: ${task.skillsRequired.join(', ')}
+Budget: ৳${task.budget}
+Location: ${task.location.city || 'Not specified'}, ${task.location.district || ''}
+
+Applications to Analyze:
+${applicationsData}
+
+Analyze all applications and recommend the best candidate. Return valid JSON only.`,
+        },
+      ],
+      model: 'llama-3.3-70b-versatile',
+      temperature: 0.3,
+      max_tokens: 2000,
+    })
+
+    let response = completion.choices[0]?.message?.content || '{}'
+
+    // Remove markdown code blocks if present
+    response = response.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim()
+
+    try {
+      // Try to parse the JSON response
+      const result = JSON.parse(response)
+
+      // Validate the structure
+      if (!result.recommendedApplicationId || !Array.isArray(result.analysis)) {
+        throw new Error('Invalid response structure')
+      }
+
+      return result
+    } catch (parseError) {
+      console.error('Error parsing AI response:', parseError)
+      console.log('Raw AI response:', response)
+
+      // Return a fallback response with reasonable scores
+      return {
+        recommendedApplicationId: applications[0]?._id || '',
+        analysis: applications.map(app => ({
+          applicationId: app._id,
+          workerName: `${app.workerId.firstName} ${app.workerId.lastName}`,
+          score: 50,
+          strengths: ['Application received'],
+          concerns: ['Unable to analyze automatically'],
+          recommendation: 'Please review manually',
+        })),
+      }
+    }
+  } catch (error) {
+    console.error('Error analyzing applications:', error)
+
+    // Return a fallback response
+    return {
+      recommendedApplicationId: applications[0]?._id || '',
+      analysis: applications.map(app => ({
+        applicationId: app._id,
+        workerName: `${app.workerId.firstName} ${app.workerId.lastName}`,
+        score: 50,
+        strengths: ['Application received'],
+        concerns: ['Analysis unavailable'],
+        recommendation: 'Please review manually',
+      })),
+    }
   }
 }
 

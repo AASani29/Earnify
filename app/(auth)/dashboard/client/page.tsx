@@ -20,6 +20,10 @@ import {
   TrendingUp,
   DollarSign,
   Star,
+  Sparkles,
+  Award,
+  ThumbsUp,
+  ThumbsDown,
 } from 'lucide-react'
 
 export default function ClientDashboardPage() {
@@ -33,6 +37,8 @@ export default function ClientDashboardPage() {
   const [loadingReviews, setLoadingReviews] = useState(false)
   const [inProgressTasks, setInProgressTasks] = useState<any[]>([])
   const [activeTab, setActiveTab] = useState<'myTasks' | 'inProgress' | 'reviews'>('myTasks')
+  const [aiRecommendation, setAiRecommendation] = useState<any>(null)
+  const [loadingAiRecommendation, setLoadingAiRecommendation] = useState(false)
 
   // Get access token from controller
   const getAccessToken = () => controller.getAccessToken()
@@ -180,6 +186,8 @@ export default function ClientDashboardPage() {
   const fetchApplications = async (taskId: string) => {
     try {
       const accessToken = getAccessToken()
+
+      // Fetch applications
       const response = await fetch(`/api/tasks/${taskId}/applications`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -193,6 +201,29 @@ export default function ClientDashboardPage() {
       const data = await response.json()
       setApplications(data.applications || [])
       setSelectedTask(taskId)
+
+      // Fetch AI recommendation if there are applications
+      if (data.applications && data.applications.length > 0) {
+        setLoadingAiRecommendation(true)
+        try {
+          const aiResponse = await fetch(`/api/ai/analyze-applications?taskId=${taskId}`, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          })
+
+          if (aiResponse.ok) {
+            const aiData = await aiResponse.json()
+            setAiRecommendation(aiData)
+          }
+        } catch (aiError) {
+          console.error('Error fetching AI recommendation:', aiError)
+        } finally {
+          setLoadingAiRecommendation(false)
+        }
+      } else {
+        setAiRecommendation(null)
+      }
     } catch (error) {
       console.error('Error fetching applications:', error)
     }
@@ -972,257 +1003,480 @@ export default function ClientDashboardPage() {
                       </div>
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {applications.map(app => (
+                        {/* AI Recommendation Banner */}
+                        {loadingAiRecommendation ? (
                           <div
-                            key={app._id}
                             style={{
-                              background: 'white',
+                              padding: '1.25rem',
+                              background: 'linear-gradient(135deg, #e3f2fd 0%, #f8f9fa 100%)',
                               borderRadius: '12px',
-                              border: '1px solid #e0e0e0',
-                              overflow: 'hidden',
-                              transition: 'all 0.2s',
-                            }}
-                            onMouseEnter={e => {
-                              e.currentTarget.style.borderColor = '#063c7a'
-                              e.currentTarget.style.boxShadow = '0 4px 12px rgba(6, 60, 122, 0.1)'
-                            }}
-                            onMouseLeave={e => {
-                              e.currentTarget.style.borderColor = '#e0e0e0'
-                              e.currentTarget.style.boxShadow = 'none'
+                              border: '1px solid #063c7a',
+                              textAlign: 'center',
                             }}
                           >
-                            {/* Application Header */}
+                            <Sparkles size={24} color="#063c7a" style={{ marginBottom: '0.5rem' }} />
+                            <p style={{ margin: 0, color: '#063c7a', fontWeight: '600' }}>
+                              AI is analyzing applications...
+                            </p>
+                          </div>
+                        ) : (
+                          aiRecommendation &&
+                          aiRecommendation.recommendedApplicationId && (
                             <div
                               style={{
                                 padding: '1.25rem 1.5rem',
-                                background: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)',
-                                borderBottom: '1px solid #e0e0e0',
+                                background: 'linear-gradient(135deg, #063c7a 0%, #084d99 100%)',
+                                borderRadius: '12px',
+                                color: 'white',
+                                border: '2px solid #063c7a',
                               }}
                             >
                               <div
                                 style={{
                                   display: 'flex',
-                                  justifyContent: 'space-between',
                                   alignItems: 'center',
+                                  gap: '0.75rem',
+                                  marginBottom: '0.75rem',
                                 }}
                               >
-                                <div>
-                                  <h3
-                                    style={{
-                                      fontSize: '1.125rem',
-                                      fontWeight: '700',
-                                      marginBottom: '0.375rem',
-                                      color: '#2c3e50',
-                                    }}
-                                  >
-                                    {app.workerId.firstName} {app.workerId.lastName}
-                                  </h3>
-                                  <p style={{ fontSize: '0.875rem', color: '#6c757d', margin: 0 }}>
-                                    {app.workerId.email}
-                                  </p>
-                                </div>
-                                <span
+                                <Sparkles size={24} strokeWidth={2} />
+                                <h3 style={{ margin: 0, fontSize: '1.125rem', fontWeight: '700' }}>
+                                  AI Recommendation
+                                </h3>
+                              </div>
+                              <p style={{ margin: 0, fontSize: '0.9375rem', opacity: 0.95, lineHeight: '1.5' }}>
+                                Based on skills, experience, ratings, and budget analysis, we recommend{' '}
+                                <strong>
+                                  {
+                                    aiRecommendation.analysis.find(
+                                      (a: any) => a.applicationId === aiRecommendation.recommendedApplicationId
+                                    )?.workerName
+                                  }
+                                </strong>{' '}
+                                for this task.
+                              </p>
+                            </div>
+                          )
+                        )}
+
+                        {/* Applications List */}
+                        {applications.map(app => {
+                          const isRecommended = aiRecommendation?.recommendedApplicationId === app._id
+                          const appAnalysis = aiRecommendation?.analysis?.find((a: any) => a.applicationId === app._id)
+
+                          return (
+                            <div
+                              key={app._id}
+                              style={{
+                                background: 'white',
+                                borderRadius: '12px',
+                                border: isRecommended ? '2px solid #063c7a' : '1px solid #e0e0e0',
+                                overflow: 'hidden',
+                                transition: 'all 0.2s',
+                                position: 'relative',
+                              }}
+                              onMouseEnter={e => {
+                                e.currentTarget.style.borderColor = '#063c7a'
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(6, 60, 122, 0.1)'
+                              }}
+                              onMouseLeave={e => {
+                                e.currentTarget.style.borderColor = isRecommended ? '#063c7a' : '#e0e0e0'
+                                e.currentTarget.style.boxShadow = 'none'
+                              }}
+                            >
+                              {/* Recommended Badge */}
+                              {isRecommended && (
+                                <div
                                   style={{
+                                    position: 'absolute',
+                                    top: '1rem',
+                                    right: '1rem',
+                                    background: 'linear-gradient(135deg, #063c7a 0%, #084d99 100%)',
+                                    color: 'white',
                                     padding: '0.5rem 1rem',
                                     borderRadius: '8px',
                                     fontSize: '0.8125rem',
-                                    fontWeight: '600',
-                                    background:
-                                      app.status === 'PENDING'
-                                        ? '#fff3cd'
-                                        : app.status === 'ACCEPTED'
-                                        ? '#d1e7dd'
-                                        : '#f8d7da',
-                                    color:
-                                      app.status === 'PENDING'
-                                        ? '#856404'
-                                        : app.status === 'ACCEPTED'
-                                        ? '#0f5132'
-                                        : '#842029',
-                                    border:
-                                      app.status === 'PENDING'
-                                        ? '1px solid #ffc107'
-                                        : app.status === 'ACCEPTED'
-                                        ? '1px solid #198754'
-                                        : '1px solid #dc3545',
+                                    fontWeight: '700',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.375rem',
+                                    boxShadow: '0 2px 8px rgba(6, 60, 122, 0.3)',
+                                    zIndex: 1,
                                   }}
                                 >
-                                  {app.status === 'PENDING'
-                                    ? 'Pending'
-                                    : app.status === 'ACCEPTED'
-                                    ? 'Accepted'
-                                    : 'Rejected'}
-                                </span>
-                              </div>
-                            </div>
-
-                            {/* Application Body */}
-                            <div style={{ padding: '1.5rem' }}>
-                              {/* Cover Letter */}
-                              <div style={{ marginBottom: '1.25rem' }}>
-                                <div
-                                  style={{
-                                    fontSize: '0.8125rem',
-                                    fontWeight: '600',
-                                    color: '#063c7a',
-                                    marginBottom: '0.625rem',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.5px',
-                                  }}
-                                >
-                                  Cover Letter
-                                </div>
-                                <p
-                                  style={{
-                                    color: '#2c3e50',
-                                    lineHeight: '1.6',
-                                    fontSize: '0.9375rem',
-                                    margin: 0,
-                                    padding: '1rem',
-                                    background: '#f8f9fa',
-                                    borderRadius: '8px',
-                                    borderLeft: '3px solid #063c7a',
-                                  }}
-                                >
-                                  {app.coverLetter}
-                                </p>
-                              </div>
-
-                              {/* Application Details */}
-                              <div
-                                style={{
-                                  display: 'grid',
-                                  gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-                                  gap: '1rem',
-                                  marginBottom: '1.25rem',
-                                }}
-                              >
-                                {app.proposedBudget && (
-                                  <div
-                                    style={{
-                                      padding: '0.875rem',
-                                      background: '#f8f9fa',
-                                      borderRadius: '8px',
-                                      border: '1px solid #e0e0e0',
-                                    }}
-                                  >
-                                    <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '0.25rem' }}>
-                                      Proposed Budget
-                                    </div>
-                                    <div style={{ fontSize: '1.125rem', fontWeight: '700', color: '#063c7a' }}>
-                                      ৳{app.proposedBudget}
-                                    </div>
-                                  </div>
-                                )}
-                                {app.estimatedCompletionTime && (
-                                  <div
-                                    style={{
-                                      padding: '0.875rem',
-                                      background: '#f8f9fa',
-                                      borderRadius: '8px',
-                                      border: '1px solid #e0e0e0',
-                                    }}
-                                  >
-                                    <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '0.25rem' }}>
-                                      Estimated Time
-                                    </div>
-                                    <div style={{ fontSize: '1.125rem', fontWeight: '700', color: '#063c7a' }}>
-                                      {app.estimatedCompletionTime}h
-                                    </div>
-                                  </div>
-                                )}
-                                <div
-                                  style={{
-                                    padding: '0.875rem',
-                                    background: '#f8f9fa',
-                                    borderRadius: '8px',
-                                    border: '1px solid #e0e0e0',
-                                  }}
-                                >
-                                  <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '0.25rem' }}>
-                                    Applied On
-                                  </div>
-                                  <div style={{ fontSize: '1.125rem', fontWeight: '700', color: '#063c7a' }}>
-                                    {new Date(app.appliedAt).toLocaleDateString('en-US', {
-                                      month: 'short',
-                                      day: 'numeric',
-                                    })}
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* Action Buttons */}
-                              {app.status === 'PENDING' && (
-                                <div style={{ display: 'flex', gap: '0.75rem' }}>
-                                  <button
-                                    onClick={() => handleAcceptApplication(app._id)}
-                                    style={{
-                                      flex: 1,
-                                      padding: '0.875rem 1.25rem',
-                                      background: 'linear-gradient(135deg, #063c7a 0%, #084d99 100%)',
-                                      color: 'white',
-                                      border: 'none',
-                                      borderRadius: '8px',
-                                      fontSize: '0.9375rem',
-                                      fontWeight: '600',
-                                      cursor: 'pointer',
-                                      transition: 'all 0.2s',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center',
-                                      gap: '0.5rem',
-                                    }}
-                                    onMouseEnter={e => {
-                                      e.currentTarget.style.transform = 'translateY(-2px)'
-                                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(6, 60, 122, 0.3)'
-                                    }}
-                                    onMouseLeave={e => {
-                                      e.currentTarget.style.transform = 'translateY(0)'
-                                      e.currentTarget.style.boxShadow = 'none'
-                                    }}
-                                  >
-                                    <CheckCircle size={18} strokeWidth={2} />
-                                    Accept
-                                  </button>
-                                  <button
-                                    onClick={() => handleRejectApplication(app._id)}
-                                    style={{
-                                      flex: 1,
-                                      padding: '0.875rem 1.25rem',
-                                      background: 'white',
-                                      color: '#dc3545',
-                                      border: '1px solid #dc3545',
-                                      borderRadius: '8px',
-                                      fontSize: '0.9375rem',
-                                      fontWeight: '600',
-                                      cursor: 'pointer',
-                                      transition: 'all 0.2s',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center',
-                                      gap: '0.5rem',
-                                    }}
-                                    onMouseEnter={e => {
-                                      e.currentTarget.style.background = '#dc3545'
-                                      e.currentTarget.style.color = 'white'
-                                      e.currentTarget.style.transform = 'translateY(-2px)'
-                                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.3)'
-                                    }}
-                                    onMouseLeave={e => {
-                                      e.currentTarget.style.background = 'white'
-                                      e.currentTarget.style.color = '#dc3545'
-                                      e.currentTarget.style.transform = 'translateY(0)'
-                                      e.currentTarget.style.boxShadow = 'none'
-                                    }}
-                                  >
-                                    <AlertCircle size={18} strokeWidth={2} />
-                                    Reject
-                                  </button>
+                                  <Award size={16} strokeWidth={2.5} />
+                                  AI RECOMMENDED
                                 </div>
                               )}
+                              {/* Application Header */}
+                              <div
+                                style={{
+                                  padding: '1.25rem 1.5rem',
+                                  background: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)',
+                                  borderBottom: '1px solid #e0e0e0',
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                  }}
+                                >
+                                  <div>
+                                    <h3
+                                      style={{
+                                        fontSize: '1.125rem',
+                                        fontWeight: '700',
+                                        marginBottom: '0.375rem',
+                                        color: '#2c3e50',
+                                      }}
+                                    >
+                                      {app.workerId.firstName} {app.workerId.lastName}
+                                    </h3>
+                                    <p style={{ fontSize: '0.875rem', color: '#6c757d', margin: 0 }}>
+                                      {app.workerId.email}
+                                    </p>
+                                  </div>
+                                  <span
+                                    style={{
+                                      padding: '0.5rem 1rem',
+                                      borderRadius: '8px',
+                                      fontSize: '0.8125rem',
+                                      fontWeight: '600',
+                                      background:
+                                        app.status === 'PENDING'
+                                          ? '#fff3cd'
+                                          : app.status === 'ACCEPTED'
+                                          ? '#d1e7dd'
+                                          : '#f8d7da',
+                                      color:
+                                        app.status === 'PENDING'
+                                          ? '#856404'
+                                          : app.status === 'ACCEPTED'
+                                          ? '#0f5132'
+                                          : '#842029',
+                                      border:
+                                        app.status === 'PENDING'
+                                          ? '1px solid #ffc107'
+                                          : app.status === 'ACCEPTED'
+                                          ? '1px solid #198754'
+                                          : '1px solid #dc3545',
+                                    }}
+                                  >
+                                    {app.status === 'PENDING'
+                                      ? 'Pending'
+                                      : app.status === 'ACCEPTED'
+                                      ? 'Accepted'
+                                      : 'Rejected'}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Application Body */}
+                              <div style={{ padding: '1.5rem' }}>
+                                {/* Cover Letter */}
+                                <div style={{ marginBottom: '1.25rem' }}>
+                                  <div
+                                    style={{
+                                      fontSize: '0.8125rem',
+                                      fontWeight: '600',
+                                      color: '#063c7a',
+                                      marginBottom: '0.625rem',
+                                      textTransform: 'uppercase',
+                                      letterSpacing: '0.5px',
+                                    }}
+                                  >
+                                    Cover Letter
+                                  </div>
+                                  <p
+                                    style={{
+                                      color: '#2c3e50',
+                                      lineHeight: '1.6',
+                                      fontSize: '0.9375rem',
+                                      margin: 0,
+                                      padding: '1rem',
+                                      background: '#f8f9fa',
+                                      borderRadius: '8px',
+                                      borderLeft: '3px solid #063c7a',
+                                    }}
+                                  >
+                                    {app.coverLetter}
+                                  </p>
+                                </div>
+
+                                {/* AI Analysis */}
+                                {appAnalysis && (
+                                  <div
+                                    style={{
+                                      marginBottom: '1.25rem',
+                                      padding: '1.25rem',
+                                      background: isRecommended
+                                        ? 'linear-gradient(135deg, #e3f2fd 0%, #f0f7ff 100%)'
+                                        : '#f8f9fa',
+                                      borderRadius: '12px',
+                                      border: isRecommended ? '2px solid #063c7a' : '1px solid #e0e0e0',
+                                    }}
+                                  >
+                                    <div
+                                      style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem',
+                                        marginBottom: '1rem',
+                                      }}
+                                    >
+                                      <Sparkles size={20} color="#063c7a" strokeWidth={2} />
+                                      <h4
+                                        style={{
+                                          margin: 0,
+                                          fontSize: '1rem',
+                                          fontWeight: '700',
+                                          color: '#063c7a',
+                                        }}
+                                      >
+                                        AI Analysis
+                                      </h4>
+                                      <div
+                                        style={{
+                                          marginLeft: 'auto',
+                                          padding: '0.375rem 0.875rem',
+                                          background: isRecommended ? '#063c7a' : '#6c757d',
+                                          color: 'white',
+                                          borderRadius: '6px',
+                                          fontSize: '0.875rem',
+                                          fontWeight: '700',
+                                        }}
+                                      >
+                                        Score: {appAnalysis.score}/100
+                                      </div>
+                                    </div>
+
+                                    {/* Strengths */}
+                                    {appAnalysis.strengths && appAnalysis.strengths.length > 0 && (
+                                      <div style={{ marginBottom: '0.875rem' }}>
+                                        <div
+                                          style={{
+                                            fontSize: '0.8125rem',
+                                            fontWeight: '600',
+                                            color: '#198754',
+                                            marginBottom: '0.5rem',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.375rem',
+                                          }}
+                                        >
+                                          <ThumbsUp size={14} strokeWidth={2} />
+                                          Strengths
+                                        </div>
+                                        <ul style={{ margin: 0, paddingLeft: '1.5rem', color: '#2c3e50' }}>
+                                          {appAnalysis.strengths.map((strength: string, idx: number) => (
+                                            <li key={idx} style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>
+                                              {strength}
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    )}
+
+                                    {/* Concerns */}
+                                    {appAnalysis.concerns && appAnalysis.concerns.length > 0 && (
+                                      <div style={{ marginBottom: '0.875rem' }}>
+                                        <div
+                                          style={{
+                                            fontSize: '0.8125rem',
+                                            fontWeight: '600',
+                                            color: '#dc3545',
+                                            marginBottom: '0.5rem',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.375rem',
+                                          }}
+                                        >
+                                          <ThumbsDown size={14} strokeWidth={2} />
+                                          Concerns
+                                        </div>
+                                        <ul style={{ margin: 0, paddingLeft: '1.5rem', color: '#2c3e50' }}>
+                                          {appAnalysis.concerns.map((concern: string, idx: number) => (
+                                            <li key={idx} style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>
+                                              {concern}
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    )}
+
+                                    {/* Recommendation */}
+                                    {appAnalysis.recommendation && (
+                                      <div
+                                        style={{
+                                          padding: '0.875rem',
+                                          background: 'white',
+                                          borderRadius: '8px',
+                                          borderLeft: '3px solid #063c7a',
+                                        }}
+                                      >
+                                        <div
+                                          style={{
+                                            fontSize: '0.8125rem',
+                                            fontWeight: '600',
+                                            color: '#063c7a',
+                                            marginBottom: '0.375rem',
+                                          }}
+                                        >
+                                          Recommendation
+                                        </div>
+                                        <p
+                                          style={{
+                                            margin: 0,
+                                            fontSize: '0.875rem',
+                                            color: '#2c3e50',
+                                            lineHeight: '1.5',
+                                          }}
+                                        >
+                                          {appAnalysis.recommendation}
+                                        </p>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+
+                                {/* Application Details */}
+                                <div
+                                  style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                                    gap: '1rem',
+                                    marginBottom: '1.25rem',
+                                  }}
+                                >
+                                  {app.proposedBudget && (
+                                    <div
+                                      style={{
+                                        padding: '0.875rem',
+                                        background: '#f8f9fa',
+                                        borderRadius: '8px',
+                                        border: '1px solid #e0e0e0',
+                                      }}
+                                    >
+                                      <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '0.25rem' }}>
+                                        Proposed Budget
+                                      </div>
+                                      <div style={{ fontSize: '1.125rem', fontWeight: '700', color: '#063c7a' }}>
+                                        ৳{app.proposedBudget}
+                                      </div>
+                                    </div>
+                                  )}
+                                  {app.estimatedCompletionTime && (
+                                    <div
+                                      style={{
+                                        padding: '0.875rem',
+                                        background: '#f8f9fa',
+                                        borderRadius: '8px',
+                                        border: '1px solid #e0e0e0',
+                                      }}
+                                    >
+                                      <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '0.25rem' }}>
+                                        Estimated Time
+                                      </div>
+                                      <div style={{ fontSize: '1.125rem', fontWeight: '700', color: '#063c7a' }}>
+                                        {app.estimatedCompletionTime}h
+                                      </div>
+                                    </div>
+                                  )}
+                                  <div
+                                    style={{
+                                      padding: '0.875rem',
+                                      background: '#f8f9fa',
+                                      borderRadius: '8px',
+                                      border: '1px solid #e0e0e0',
+                                    }}
+                                  >
+                                    <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '0.25rem' }}>
+                                      Applied On
+                                    </div>
+                                    <div style={{ fontSize: '1.125rem', fontWeight: '700', color: '#063c7a' }}>
+                                      {new Date(app.appliedAt).toLocaleDateString('en-US', {
+                                        month: 'short',
+                                        day: 'numeric',
+                                      })}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Action Buttons */}
+                                {app.status === 'PENDING' && (
+                                  <div style={{ display: 'flex', gap: '0.75rem' }}>
+                                    <button
+                                      onClick={() => handleAcceptApplication(app._id)}
+                                      style={{
+                                        flex: 1,
+                                        padding: '0.875rem 1.25rem',
+                                        background: 'linear-gradient(135deg, #063c7a 0%, #084d99 100%)',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '8px',
+                                        fontSize: '0.9375rem',
+                                        fontWeight: '600',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '0.5rem',
+                                      }}
+                                      onMouseEnter={e => {
+                                        e.currentTarget.style.transform = 'translateY(-2px)'
+                                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(6, 60, 122, 0.3)'
+                                      }}
+                                      onMouseLeave={e => {
+                                        e.currentTarget.style.transform = 'translateY(0)'
+                                        e.currentTarget.style.boxShadow = 'none'
+                                      }}
+                                    >
+                                      <CheckCircle size={18} strokeWidth={2} />
+                                      Accept
+                                    </button>
+                                    <button
+                                      onClick={() => handleRejectApplication(app._id)}
+                                      style={{
+                                        flex: 1,
+                                        padding: '0.875rem 1.25rem',
+                                        background: 'white',
+                                        color: '#dc3545',
+                                        border: '1px solid #dc3545',
+                                        borderRadius: '8px',
+                                        fontSize: '0.9375rem',
+                                        fontWeight: '600',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '0.5rem',
+                                      }}
+                                      onMouseEnter={e => {
+                                        e.currentTarget.style.background = '#dc3545'
+                                        e.currentTarget.style.color = 'white'
+                                        e.currentTarget.style.transform = 'translateY(-2px)'
+                                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.3)'
+                                      }}
+                                      onMouseLeave={e => {
+                                        e.currentTarget.style.background = 'white'
+                                        e.currentTarget.style.color = '#dc3545'
+                                        e.currentTarget.style.transform = 'translateY(0)'
+                                        e.currentTarget.style.boxShadow = 'none'
+                                      }}
+                                    >
+                                      <AlertCircle size={18} strokeWidth={2} />
+                                      Reject
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          )
+                        })}
                       </div>
                     )}
                   </div>
