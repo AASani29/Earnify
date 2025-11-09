@@ -12,6 +12,7 @@ import {
   Calendar,
   Clock,
   User,
+  Users,
   Briefcase,
   AlertCircle,
   CheckCircle,
@@ -425,37 +426,48 @@ export default function TaskDetailsPage() {
             <div
               style={{
                 padding: '1.5rem',
-                background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                background: '#f8f9fa',
                 borderRadius: '12px',
-                color: 'white',
+                border: '1px solid #e0e0e0',
               }}
             >
-              <div style={{ fontSize: '0.875rem', opacity: 0.9, marginBottom: '0.5rem' }}>📂 Category</div>
-              <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>{task.category.replace('_', ' ')}</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                <Briefcase size={18} color="#063c7a" strokeWidth={2} />
+                <div style={{ fontSize: '0.875rem', color: '#666', fontWeight: '600' }}>Category</div>
+              </div>
+              <div style={{ fontSize: '1.125rem', fontWeight: '600', color: '#1a1a1a' }}>
+                {task.category.replace('_', ' ')}
+              </div>
             </div>
             <div
               style={{
                 padding: '1.5rem',
-                background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                background: '#f8f9fa',
                 borderRadius: '12px',
-                color: 'white',
+                border: '1px solid #e0e0e0',
               }}
             >
-              <div style={{ fontSize: '0.875rem', opacity: 0.9, marginBottom: '0.5rem' }}>⏱️ Duration</div>
-              <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                <Clock size={18} color="#063c7a" strokeWidth={2} />
+                <div style={{ fontSize: '0.875rem', color: '#666', fontWeight: '600' }}>Duration</div>
+              </div>
+              <div style={{ fontSize: '1.125rem', fontWeight: '600', color: '#1a1a1a' }}>
                 {task.estimatedDuration ? `${task.estimatedDuration} hours` : 'Flexible'}
               </div>
             </div>
             <div
               style={{
                 padding: '1.5rem',
-                background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                background: '#f8f9fa',
                 borderRadius: '12px',
-                color: 'white',
+                border: '1px solid #e0e0e0',
               }}
             >
-              <div style={{ fontSize: '0.875rem', opacity: 0.9, marginBottom: '0.5rem' }}>📅 Deadline</div>
-              <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                <Calendar size={18} color="#063c7a" strokeWidth={2} />
+                <div style={{ fontSize: '0.875rem', color: '#666', fontWeight: '600' }}>Deadline</div>
+              </div>
+              <div style={{ fontSize: '1.125rem', fontWeight: '600', color: '#1a1a1a' }}>
                 {task.deadline ? new Date(task.deadline).toLocaleDateString() : 'Flexible'}
               </div>
             </div>
@@ -465,26 +477,35 @@ export default function TaskDetailsPage() {
           <div style={{ marginBottom: '2rem' }}>
             <h2
               style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
+                fontSize: '1.25rem',
+                fontWeight: '600',
                 marginBottom: '1rem',
-                color: '#495057',
+                color: '#1a1a1a',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
               }}
             >
-              <span>📝</span> Task Description
+              <FileText size={20} color="#063c7a" strokeWidth={2} />
+              Task Description
             </h2>
             <div
               style={{
                 background: '#f8f9fa',
                 padding: '1.5rem',
                 borderRadius: '12px',
-                borderLeft: '4px solid #667eea',
+                border: '1px solid #e0e0e0',
               }}
             >
-              <p style={{ color: '#495057', lineHeight: '1.8', whiteSpace: 'pre-wrap', fontSize: '1.05rem' }}>
+              <p
+                style={{
+                  color: '#495057',
+                  lineHeight: '1.8',
+                  whiteSpace: 'pre-wrap',
+                  fontSize: '0.9375rem',
+                  margin: 0,
+                }}
+              >
                 {task.description}
               </p>
             </div>
@@ -494,38 +515,45 @@ export default function TaskDetailsPage() {
           <div style={{ marginBottom: '2rem' }}>
             <h2
               style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
+                fontSize: '1.25rem',
+                fontWeight: '600',
                 marginBottom: '1rem',
-                color: '#495057',
+                color: '#1a1a1a',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
               }}
             >
-              <span>📍</span> Location
+              <MapPin size={20} color="#063c7a" strokeWidth={2} />
+              Location
             </h2>
             <div
               style={{
                 background: '#f8f9fa',
                 padding: '1.5rem',
                 borderRadius: '12px',
+                border: '1px solid #e0e0e0',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '0.5rem',
+                gap: '0.75rem',
               }}
             >
               <div
-                style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.05rem', color: '#495057' }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '0.5rem',
+                  fontSize: '0.9375rem',
+                  color: '#495057',
+                }}
               >
-                <span style={{ fontSize: '1.25rem' }}>🏠</span>
+                <MapPin size={16} color="#666" strokeWidth={2} style={{ marginTop: '0.125rem', flexShrink: 0 }} />
                 <span>{task.location.address}</span>
               </div>
               <div
-                style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.05rem', color: '#6c757d' }}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: '#666' }}
               >
-                <span style={{ fontSize: '1.25rem' }}>🌆</span>
-                <span>
+                <span style={{ fontWeight: '600' }}>
                   {task.location.city}, {task.location.district}
                 </span>
               </div>
@@ -537,29 +565,30 @@ export default function TaskDetailsPage() {
             <div style={{ marginBottom: '2rem' }}>
               <h2
                 style={{
-                  fontSize: '1.5rem',
-                  fontWeight: 'bold',
+                  fontSize: '1.25rem',
+                  fontWeight: '600',
                   marginBottom: '1rem',
-                  color: '#495057',
+                  color: '#1a1a1a',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.5rem',
                 }}
               >
-                <span>🛠️</span> Skills Required
+                <Wrench size={20} color="#063c7a" strokeWidth={2} />
+                Skills Required
               </h2>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
                 {task.skillsRequired.map((skill: string, index: number) => (
                   <span
                     key={index}
                     style={{
-                      padding: '0.75rem 1.25rem',
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                      color: 'white',
-                      borderRadius: '25px',
-                      fontSize: '0.95rem',
+                      padding: '0.625rem 1rem',
+                      background: '#f0f4f8',
+                      color: '#063c7a',
+                      border: '1px solid #d0dce8',
+                      borderRadius: '8px',
+                      fontSize: '0.875rem',
                       fontWeight: '600',
-                      boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
                     }}
                   >
                     {skill}
@@ -582,27 +611,32 @@ export default function TaskDetailsPage() {
               onClick={() => setShowApplicationForm(true)}
               style={{
                 width: '100%',
-                padding: '1.25rem',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                padding: '1rem',
+                background: 'linear-gradient(135deg, #063c7a 0%, #084d99 100%)',
                 color: 'white',
                 border: 'none',
-                borderRadius: '12px',
-                fontSize: '1.25rem',
-                fontWeight: '700',
+                borderRadius: '10px',
+                fontSize: '1rem',
+                fontWeight: '600',
                 cursor: 'pointer',
-                boxShadow: '0 4px 20px rgba(102, 126, 234, 0.4)',
-                transition: 'transform 0.2s, box-shadow 0.2s',
+                boxShadow: '0 4px 14px rgba(6, 60, 122, 0.3)',
+                transition: 'all 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
               }}
               onMouseEnter={e => {
                 e.currentTarget.style.transform = 'translateY(-2px)'
-                e.currentTarget.style.boxShadow = '0 6px 25px rgba(102, 126, 234, 0.5)'
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(6, 60, 122, 0.4)'
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = '0 4px 20px rgba(102, 126, 234, 0.4)'
+                e.currentTarget.style.boxShadow = '0 4px 14px rgba(6, 60, 122, 0.3)'
               }}
             >
-              🚀 Apply for this Task
+              <Send size={20} strokeWidth={2} />
+              Apply for this Task
             </button>
           )}
 
@@ -611,27 +645,32 @@ export default function TaskDetailsPage() {
               onClick={() => router.push(`/dashboard/client?taskId=${task._id}`)}
               style={{
                 width: '100%',
-                padding: '1.25rem',
-                background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                padding: '1rem',
+                background: 'linear-gradient(135deg, #063c7a 0%, #084d99 100%)',
                 color: 'white',
                 border: 'none',
-                borderRadius: '12px',
-                fontSize: '1.25rem',
-                fontWeight: '700',
+                borderRadius: '10px',
+                fontSize: '1rem',
+                fontWeight: '600',
                 cursor: 'pointer',
-                boxShadow: '0 4px 20px rgba(79, 172, 254, 0.4)',
-                transition: 'transform 0.2s, box-shadow 0.2s',
+                boxShadow: '0 4px 14px rgba(6, 60, 122, 0.3)',
+                transition: 'all 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
               }}
               onMouseEnter={e => {
                 e.currentTarget.style.transform = 'translateY(-2px)'
-                e.currentTarget.style.boxShadow = '0 6px 25px rgba(79, 172, 254, 0.5)'
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(6, 60, 122, 0.4)'
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = '0 4px 20px rgba(79, 172, 254, 0.4)'
+                e.currentTarget.style.boxShadow = '0 4px 14px rgba(6, 60, 122, 0.3)'
               }}
             >
-              📋 Manage Applications
+              <Users size={20} strokeWidth={2} />
+              Manage Applications
             </button>
           )}
 
@@ -641,9 +680,9 @@ export default function TaskDetailsPage() {
               style={{
                 marginTop: '2rem',
                 padding: '2rem',
-                background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+                background: 'white',
                 borderRadius: '12px',
-                border: '1px solid #bae6fd',
+                border: '1px solid #e0e0e0',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
@@ -651,7 +690,7 @@ export default function TaskDetailsPage() {
                   style={{
                     width: '40px',
                     height: '40px',
-                    background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
+                    background: 'linear-gradient(135deg, #063c7a 0%, #084d99 100%)',
                     borderRadius: '10px',
                     display: 'flex',
                     alignItems: 'center',
@@ -948,23 +987,24 @@ export default function TaskDetailsPage() {
               style={{
                 marginTop: '2rem',
                 padding: '2rem',
-                background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
-                borderRadius: '16px',
-                border: '2px solid #667eea',
+                background: 'white',
+                borderRadius: '12px',
+                border: '1px solid #e0e0e0',
               }}
             >
               <h2
                 style={{
-                  fontSize: '1.75rem',
-                  fontWeight: 'bold',
+                  fontSize: '1.25rem',
+                  fontWeight: '600',
                   marginBottom: '1.5rem',
-                  color: '#495057',
+                  color: '#1a1a1a',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.5rem',
                 }}
               >
-                <span>✍️</span> Submit Your Application
+                <Send size={20} color="#063c7a" strokeWidth={2} />
+                Submit Your Application
               </h2>
               <form onSubmit={handleApply}>
                 <div style={{ marginBottom: '1.5rem' }}>
@@ -1038,22 +1078,55 @@ export default function TaskDetailsPage() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="btn-submit"
                     style={{
                       flex: 1,
                       padding: '1rem',
-                      fontSize: '1.1rem',
-                      opacity: submitting ? 0.6 : 1,
+                      background: submitting ? '#9ca3af' : 'linear-gradient(135deg, #063c7a 0%, #084d99 100%)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '10px',
+                      fontSize: '1rem',
+                      fontWeight: '600',
                       cursor: submitting ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.2s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem',
                     }}
                   >
-                    {submitting ? '⏳ Submitting...' : '🚀 Submit Application'}
+                    {submitting ? (
+                      <>
+                        <Loader2 size={20} strokeWidth={2} style={{ animation: 'spin 1s linear infinite' }} />
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        <Send size={20} strokeWidth={2} />
+                        Submit Application
+                      </>
+                    )}
                   </button>
                   <button
                     type="button"
                     onClick={() => setShowApplicationForm(false)}
-                    className="btn-cancel"
-                    style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}
+                    style={{
+                      padding: '1rem 2rem',
+                      background: 'white',
+                      color: '#666',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '10px',
+                      fontSize: '1rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.background = '#f8f9fa'
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.background = 'white'
+                    }}
                   >
                     Cancel
                   </button>
