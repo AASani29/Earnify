@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import AuthNavbar from '@/components/AuthNavbar'
 import ClientInProgressTasks from '@/components/ClientInProgressTasks'
 import SupportChatbot from '@/components/SupportChatbot'
+import HelpButton from '@/components/HelpButton'
 import {
   Briefcase,
   CheckCircle,
@@ -1281,6 +1282,9 @@ export default function ClientDashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Help Button */}
+      <HelpButton />
 
       {/* Support Chatbot */}
       <SupportChatbot />

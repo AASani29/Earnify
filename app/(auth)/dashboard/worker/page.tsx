@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import AuthNavbar from '@/components/AuthNavbar'
 import WorkerInProgressTasks from '@/components/WorkerInProgressTasks'
 import SupportChatbot from '@/components/SupportChatbot'
+import HelpButton from '@/components/HelpButton'
 import {
   Briefcase,
   Search,
@@ -1485,6 +1486,9 @@ export default function WorkerDashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Help Button */}
+      <HelpButton />
 
       {/* Support Chatbot */}
       <SupportChatbot />
