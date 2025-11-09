@@ -875,199 +875,357 @@ export default function ClientDashboardPage() {
                   left: 0,
                   right: 0,
                   bottom: 0,
-                  background: 'rgba(0,0,0,0.5)',
+                  background: 'rgba(6, 60, 122, 0.4)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   zIndex: 1000,
+                  backdropFilter: 'blur(4px)',
+                }}
+                onClick={() => {
+                  setSelectedTask(null)
+                  setApplications([])
                 }}
               >
                 <div
+                  onClick={e => e.stopPropagation()}
                   style={{
                     background: 'white',
-                    padding: '2rem',
-                    borderRadius: '8px',
-                    maxWidth: '600px',
+                    borderRadius: '16px',
+                    maxWidth: '700px',
                     width: '90%',
-                    maxHeight: '80vh',
-                    overflow: 'auto',
+                    maxHeight: '85vh',
+                    overflow: 'hidden',
+                    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+                    display: 'flex',
+                    flexDirection: 'column',
                   }}
                 >
+                  {/* Header */}
                   <div
                     style={{
+                      background: 'linear-gradient(135deg, #063c7a 0%, #084d99 100%)',
+                      color: 'white',
+                      padding: '1.5rem 2rem',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      marginBottom: '1rem',
                     }}
                   >
-                    <h2>Applications</h2>
+                    <div>
+                      <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '700' }}>Applications</h2>
+                      <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', opacity: 0.9 }}>
+                        {applications.length} application{applications.length !== 1 ? 's' : ''} received
+                      </p>
+                    </div>
                     <button
-                      onClick={() => setSelectedTask(null)}
-                      style={{ fontSize: '1.5rem', border: 'none', background: 'none', cursor: 'pointer' }}
+                      onClick={() => {
+                        setSelectedTask(null)
+                        setApplications([])
+                      }}
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.15)',
+                        border: 'none',
+                        color: 'white',
+                        cursor: 'pointer',
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.5rem',
+                        fontWeight: '300',
+                        transition: 'background 0.2s',
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)'
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)'
+                      }}
                     >
                       ×
                     </button>
                   </div>
 
-                  {applications.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '3rem', color: '#6c757d' }}>
-                      <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📭</div>
-                      <p style={{ fontSize: '1.1rem' }}>No applications yet</p>
-                      <p style={{ fontSize: '0.95rem' }}>
-                        Applications will appear here once workers apply to this task.
-                      </p>
-                    </div>
-                  ) : (
-                    <div style={{ display: 'grid', gap: '1.5rem' }}>
-                      {applications.map(app => (
-                        <div
-                          key={app._id}
-                          style={{
-                            padding: '1.5rem',
-                            background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
-                            borderRadius: '12px',
-                            border: '2px solid #e9ecef',
-                          }}
+                  {/* Content */}
+                  <div
+                    style={{
+                      flex: 1,
+                      overflowY: 'auto',
+                      padding: '1.5rem 2rem',
+                      background: '#f8f9fa',
+                    }}
+                  >
+                    {applications.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '4rem 2rem', color: '#6c757d' }}>
+                        <Users size={64} color="#e0e0e0" style={{ marginBottom: '1rem' }} />
+                        <p
+                          style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem', color: '#2c3e50' }}
                         >
+                          No applications yet
+                        </p>
+                        <p style={{ fontSize: '0.9375rem' }}>
+                          Applications will appear here once workers apply to this task.
+                        </p>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {applications.map(app => (
                           <div
+                            key={app._id}
                             style={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'flex-start',
-                              marginBottom: '1rem',
-                              flexWrap: 'wrap',
-                              gap: '1rem',
+                              background: 'white',
+                              borderRadius: '12px',
+                              border: '1px solid #e0e0e0',
+                              overflow: 'hidden',
+                              transition: 'all 0.2s',
+                            }}
+                            onMouseEnter={e => {
+                              e.currentTarget.style.borderColor = '#063c7a'
+                              e.currentTarget.style.boxShadow = '0 4px 12px rgba(6, 60, 122, 0.1)'
+                            }}
+                            onMouseLeave={e => {
+                              e.currentTarget.style.borderColor = '#e0e0e0'
+                              e.currentTarget.style.boxShadow = 'none'
                             }}
                           >
-                            <div>
-                              <h3
-                                style={{
-                                  fontSize: '1.25rem',
-                                  fontWeight: 'bold',
-                                  marginBottom: '0.25rem',
-                                  color: '#495057',
-                                }}
-                              >
-                                👤 {app.workerId.firstName} {app.workerId.lastName}
-                              </h3>
-                              <p style={{ fontSize: '0.875rem', color: '#6c757d' }}>
-                                📧 {app.workerId.email}
-                                {app.workerId.phoneNumber && ` • 📱 ${app.workerId.phoneNumber}`}
-                              </p>
-                            </div>
-                            <span
-                              style={{
-                                padding: '0.5rem 1rem',
-                                borderRadius: '20px',
-                                fontSize: '0.875rem',
-                                fontWeight: '600',
-                                background:
-                                  app.status === 'PENDING'
-                                    ? 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
-                                    : app.status === 'ACCEPTED'
-                                    ? 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'
-                                    : 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)',
-                                color: 'white',
-                              }}
-                            >
-                              {app.status === 'PENDING'
-                                ? '⏳ Pending'
-                                : app.status === 'ACCEPTED'
-                                ? '✅ Accepted'
-                                : '❌ Rejected'}
-                            </span>
-                          </div>
-
-                          <div
-                            style={{ background: 'white', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' }}
-                          >
+                            {/* Application Header */}
                             <div
                               style={{
-                                fontSize: '0.875rem',
-                                fontWeight: '600',
-                                color: '#6c757d',
-                                marginBottom: '0.5rem',
+                                padding: '1.25rem 1.5rem',
+                                background: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)',
+                                borderBottom: '1px solid #e0e0e0',
                               }}
                             >
-                              📝 Cover Letter:
-                            </div>
-                            <p style={{ color: '#495057', lineHeight: '1.6', fontSize: '0.95rem' }}>
-                              {app.coverLetter}
-                            </p>
-                          </div>
-
-                          <div
-                            style={{
-                              display: 'flex',
-                              gap: '2rem',
-                              flexWrap: 'wrap',
-                              fontSize: '0.9rem',
-                              color: '#6c757d',
-                              marginBottom: '1rem',
-                            }}
-                          >
-                            {app.proposedBudget && (
-                              <div>
-                                <span style={{ fontWeight: '600' }}>💰 Proposed Budget:</span> ৳{app.proposedBudget}
-                              </div>
-                            )}
-                            {app.estimatedCompletionTime && (
-                              <div>
-                                <span style={{ fontWeight: '600' }}>⏱️ Estimated Time:</span>{' '}
-                                {app.estimatedCompletionTime} hours
-                              </div>
-                            )}
-                            <div>
-                              <span style={{ fontWeight: '600' }}>📅 Applied:</span>{' '}
-                              {new Date(app.appliedAt).toLocaleDateString()}
-                            </div>
-                          </div>
-
-                          {app.status === 'PENDING' && (
-                            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                              <button
-                                onClick={() => handleAcceptApplication(app._id)}
+                              <div
                                 style={{
-                                  flex: 1,
-                                  padding: '0.75rem',
-                                  background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
-                                  color: 'white',
-                                  border: 'none',
-                                  borderRadius: '8px',
-                                  fontWeight: '600',
-                                  cursor: 'pointer',
-                                  transition: 'transform 0.2s',
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
                                 }}
-                                onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-2px)')}
-                                onMouseLeave={e => (e.currentTarget.style.transform = 'translateY(0)')}
                               >
-                                ✅ Accept Application
-                              </button>
-                              <button
-                                onClick={() => handleRejectApplication(app._id)}
-                                style={{
-                                  flex: 1,
-                                  padding: '0.75rem',
-                                  background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)',
-                                  color: 'white',
-                                  border: 'none',
-                                  borderRadius: '8px',
-                                  fontWeight: '600',
-                                  cursor: 'pointer',
-                                  transition: 'transform 0.2s',
-                                }}
-                                onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-2px)')}
-                                onMouseLeave={e => (e.currentTarget.style.transform = 'translateY(0)')}
-                              >
-                                ❌ Reject Application
-                              </button>
+                                <div>
+                                  <h3
+                                    style={{
+                                      fontSize: '1.125rem',
+                                      fontWeight: '700',
+                                      marginBottom: '0.375rem',
+                                      color: '#2c3e50',
+                                    }}
+                                  >
+                                    {app.workerId.firstName} {app.workerId.lastName}
+                                  </h3>
+                                  <p style={{ fontSize: '0.875rem', color: '#6c757d', margin: 0 }}>
+                                    {app.workerId.email}
+                                  </p>
+                                </div>
+                                <span
+                                  style={{
+                                    padding: '0.5rem 1rem',
+                                    borderRadius: '8px',
+                                    fontSize: '0.8125rem',
+                                    fontWeight: '600',
+                                    background:
+                                      app.status === 'PENDING'
+                                        ? '#fff3cd'
+                                        : app.status === 'ACCEPTED'
+                                        ? '#d1e7dd'
+                                        : '#f8d7da',
+                                    color:
+                                      app.status === 'PENDING'
+                                        ? '#856404'
+                                        : app.status === 'ACCEPTED'
+                                        ? '#0f5132'
+                                        : '#842029',
+                                    border:
+                                      app.status === 'PENDING'
+                                        ? '1px solid #ffc107'
+                                        : app.status === 'ACCEPTED'
+                                        ? '1px solid #198754'
+                                        : '1px solid #dc3545',
+                                  }}
+                                >
+                                  {app.status === 'PENDING'
+                                    ? 'Pending'
+                                    : app.status === 'ACCEPTED'
+                                    ? 'Accepted'
+                                    : 'Rejected'}
+                                </span>
+                              </div>
                             </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
+
+                            {/* Application Body */}
+                            <div style={{ padding: '1.5rem' }}>
+                              {/* Cover Letter */}
+                              <div style={{ marginBottom: '1.25rem' }}>
+                                <div
+                                  style={{
+                                    fontSize: '0.8125rem',
+                                    fontWeight: '600',
+                                    color: '#063c7a',
+                                    marginBottom: '0.625rem',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.5px',
+                                  }}
+                                >
+                                  Cover Letter
+                                </div>
+                                <p
+                                  style={{
+                                    color: '#2c3e50',
+                                    lineHeight: '1.6',
+                                    fontSize: '0.9375rem',
+                                    margin: 0,
+                                    padding: '1rem',
+                                    background: '#f8f9fa',
+                                    borderRadius: '8px',
+                                    borderLeft: '3px solid #063c7a',
+                                  }}
+                                >
+                                  {app.coverLetter}
+                                </p>
+                              </div>
+
+                              {/* Application Details */}
+                              <div
+                                style={{
+                                  display: 'grid',
+                                  gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                                  gap: '1rem',
+                                  marginBottom: '1.25rem',
+                                }}
+                              >
+                                {app.proposedBudget && (
+                                  <div
+                                    style={{
+                                      padding: '0.875rem',
+                                      background: '#f8f9fa',
+                                      borderRadius: '8px',
+                                      border: '1px solid #e0e0e0',
+                                    }}
+                                  >
+                                    <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '0.25rem' }}>
+                                      Proposed Budget
+                                    </div>
+                                    <div style={{ fontSize: '1.125rem', fontWeight: '700', color: '#063c7a' }}>
+                                      ৳{app.proposedBudget}
+                                    </div>
+                                  </div>
+                                )}
+                                {app.estimatedCompletionTime && (
+                                  <div
+                                    style={{
+                                      padding: '0.875rem',
+                                      background: '#f8f9fa',
+                                      borderRadius: '8px',
+                                      border: '1px solid #e0e0e0',
+                                    }}
+                                  >
+                                    <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '0.25rem' }}>
+                                      Estimated Time
+                                    </div>
+                                    <div style={{ fontSize: '1.125rem', fontWeight: '700', color: '#063c7a' }}>
+                                      {app.estimatedCompletionTime}h
+                                    </div>
+                                  </div>
+                                )}
+                                <div
+                                  style={{
+                                    padding: '0.875rem',
+                                    background: '#f8f9fa',
+                                    borderRadius: '8px',
+                                    border: '1px solid #e0e0e0',
+                                  }}
+                                >
+                                  <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '0.25rem' }}>
+                                    Applied On
+                                  </div>
+                                  <div style={{ fontSize: '1.125rem', fontWeight: '700', color: '#063c7a' }}>
+                                    {new Date(app.appliedAt).toLocaleDateString('en-US', {
+                                      month: 'short',
+                                      day: 'numeric',
+                                    })}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Action Buttons */}
+                              {app.status === 'PENDING' && (
+                                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                                  <button
+                                    onClick={() => handleAcceptApplication(app._id)}
+                                    style={{
+                                      flex: 1,
+                                      padding: '0.875rem 1.25rem',
+                                      background: 'linear-gradient(135deg, #063c7a 0%, #084d99 100%)',
+                                      color: 'white',
+                                      border: 'none',
+                                      borderRadius: '8px',
+                                      fontSize: '0.9375rem',
+                                      fontWeight: '600',
+                                      cursor: 'pointer',
+                                      transition: 'all 0.2s',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      gap: '0.5rem',
+                                    }}
+                                    onMouseEnter={e => {
+                                      e.currentTarget.style.transform = 'translateY(-2px)'
+                                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(6, 60, 122, 0.3)'
+                                    }}
+                                    onMouseLeave={e => {
+                                      e.currentTarget.style.transform = 'translateY(0)'
+                                      e.currentTarget.style.boxShadow = 'none'
+                                    }}
+                                  >
+                                    <CheckCircle size={18} strokeWidth={2} />
+                                    Accept
+                                  </button>
+                                  <button
+                                    onClick={() => handleRejectApplication(app._id)}
+                                    style={{
+                                      flex: 1,
+                                      padding: '0.875rem 1.25rem',
+                                      background: 'white',
+                                      color: '#dc3545',
+                                      border: '1px solid #dc3545',
+                                      borderRadius: '8px',
+                                      fontSize: '0.9375rem',
+                                      fontWeight: '600',
+                                      cursor: 'pointer',
+                                      transition: 'all 0.2s',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      gap: '0.5rem',
+                                    }}
+                                    onMouseEnter={e => {
+                                      e.currentTarget.style.background = '#dc3545'
+                                      e.currentTarget.style.color = 'white'
+                                      e.currentTarget.style.transform = 'translateY(-2px)'
+                                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.3)'
+                                    }}
+                                    onMouseLeave={e => {
+                                      e.currentTarget.style.background = 'white'
+                                      e.currentTarget.style.color = '#dc3545'
+                                      e.currentTarget.style.transform = 'translateY(0)'
+                                      e.currentTarget.style.boxShadow = 'none'
+                                    }}
+                                  >
+                                    <AlertCircle size={18} strokeWidth={2} />
+                                    Reject
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

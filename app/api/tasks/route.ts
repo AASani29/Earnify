@@ -48,6 +48,18 @@ export async function GET(request: NextRequest) {
       .limit(limit)
       .lean()
 
+    // Add application count to each task
+    const TaskApplication = (await import('@/lib/models/TaskApplication')).default
+    const tasksWithApplicationCount = await Promise.all(
+      tasks.map(async (task: any) => {
+        const applicationCount = await TaskApplication.countDocuments({ taskId: task._id })
+        return {
+          ...task,
+          applicationCount,
+        }
+      })
+    )
+
     // Debug logging for in-progress tasks
     if (status === 'IN_PROGRESS') {
       console.log('Fetching IN_PROGRESS tasks for clientId:', clientId)
@@ -61,7 +73,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({
-      tasks,
+      tasks: tasksWithApplicationCount,
       pagination: {
         page,
         limit,
