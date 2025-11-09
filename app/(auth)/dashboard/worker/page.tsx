@@ -60,6 +60,7 @@ export default function WorkerDashboardPage() {
     search: '',
     status: 'OPEN',
   })
+  const [workerProfile, setWorkerProfile] = useState<any>(null)
 
   const getAccessToken = () => controller.getAccessToken()
 
@@ -81,8 +82,61 @@ export default function WorkerDashboardPage() {
       fetchInProgressTasks()
       fetchAIRecommendations()
       fetchReviews()
+      fetchWorkerProfile()
     }
   }, [user, filters])
+
+  const fetchWorkerProfile = async () => {
+    try {
+      const token = getAccessToken()
+      const response = await fetch('/api/profile', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setWorkerProfile(data.profile)
+      }
+    } catch (error) {
+      console.error('Error fetching worker profile:', error)
+    }
+  }
+
+  const calculateProfileCompletion = () => {
+    if (!workerProfile) return 0
+
+    const fields = [
+      { key: 'bio', weight: 15 },
+      { key: 'skills', weight: 25, isArray: true, minLength: 3 },
+      { key: 'experience', weight: 15 },
+      { key: 'hourlyRate', weight: 10 },
+      { key: 'city', weight: 10 },
+      { key: 'area', weight: 10 },
+      { key: 'availability', weight: 5 },
+      { key: 'phoneNumber', weight: 10, source: 'user' },
+    ]
+
+    let totalScore = 0
+
+    fields.forEach(field => {
+      const value = field.source === 'user' ? (user as any)?.[field.key] : workerProfile[field.key]
+
+      if (field.isArray) {
+        if (Array.isArray(value) && value.length >= (field.minLength || 1)) {
+          totalScore += field.weight
+        }
+      } else {
+        if (value !== undefined && value !== null && value !== '') {
+          totalScore += field.weight
+        }
+      }
+    })
+
+    return Math.min(totalScore, 100)
+  }
+
+  const profileCompletion = calculateProfileCompletion()
 
   const fetchTasks = async () => {
     try {
@@ -270,12 +324,125 @@ export default function WorkerDashboardPage() {
       <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem 1rem' }}>
         {/* Header */}
         <div style={{ marginBottom: '2rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+          <div
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}
+          >
             <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#1a1a1a', margin: 0 }}>Worker Dashboard</h1>
+
+            {/* Profile Complete Badge - Only show when 100% */}
+            {workerProfile && profileCompletion === 100 && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.5rem 1rem',
+                  background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                  borderRadius: '8px',
+                  boxShadow: '0 2px 6px rgba(40, 167, 69, 0.2)',
+                }}
+              >
+                <CheckCircle size={18} style={{ color: 'white' }} />
+                <span style={{ fontSize: '0.875rem', fontWeight: '600', color: 'white' }}>Profile Complete</span>
+              </div>
+            )}
           </div>
           <p style={{ color: '#666', fontSize: '1rem' }}>
             Welcome back, {user.firstName}! Find and apply for tasks below
           </p>
+
+          {/* Profile Completion Indicator - Only show when less than 100% */}
+          {workerProfile && profileCompletion < 100 && (
+            <div
+              style={{
+                marginTop: '1.5rem',
+                background: 'white',
+                border: '1px solid #e0e0e0',
+                borderRadius: '12px',
+                padding: '1.25rem 1.5rem',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: '0.75rem',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <UserIcon size={18} style={{ color: '#063c7a' }} />
+                  <span style={{ fontSize: '0.9375rem', fontWeight: '600', color: '#1a1a1a' }}>Profile Completion</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <span style={{ fontSize: '1.125rem', fontWeight: '700', color: '#063c7a' }}>
+                    {profileCompletion}%
+                  </span>
+                  <button
+                    onClick={() => router.push('/profile')}
+                    style={{
+                      padding: '0.375rem 0.875rem',
+                      background: 'linear-gradient(135deg, #063c7a 0%, #084d99 100%)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '0.8125rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.transform = 'translateY(-1px)'
+                      e.currentTarget.style.boxShadow = '0 4px 8px rgba(6, 60, 122, 0.3)'
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.transform = 'translateY(0)'
+                      e.currentTarget.style.boxShadow = 'none'
+                    }}
+                  >
+                    Complete Profile
+                  </button>
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div
+                style={{
+                  width: '100%',
+                  height: '8px',
+                  background: '#f0f0f0',
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                  position: 'relative',
+                }}
+              >
+                <div
+                  style={{
+                    width: `${profileCompletion}%`,
+                    height: '100%',
+                    background:
+                      profileCompletion >= 80
+                        ? 'linear-gradient(90deg, #063c7a 0%, #084d99 100%)'
+                        : profileCompletion >= 50
+                        ? 'linear-gradient(90deg, #084d99 0%, #0a5fb8 100%)'
+                        : 'linear-gradient(90deg, #6c757d 0%, #868e96 100%)',
+                    borderRadius: '8px',
+                    transition: 'width 0.5s ease-in-out',
+                  }}
+                />
+              </div>
+
+              {/* Helpful Message */}
+              <p style={{ fontSize: '0.8125rem', color: '#666', marginTop: '0.75rem', marginBottom: 0 }}>
+                {profileCompletion >= 80
+                  ? 'Almost there! Complete your profile to maximize your visibility to potential clients.'
+                  : profileCompletion >= 50
+                  ? 'Good progress! Add more details to stand out and get better task recommendations.'
+                  : 'Complete your profile to increase your chances of being hired and get personalized task recommendations.'}
+              </p>
+            </div>
+          )}
 
           {/* Tabs */}
           <div
