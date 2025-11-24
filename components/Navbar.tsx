@@ -43,7 +43,8 @@ export default function Navbar({ showAuthButtons = true }: NavbarProps) {
         />
       </div>
 
-      
+        
+        {/* Auth Buttons - Slightly to the left */}
       <div
         style={{
           display: 'flex',
